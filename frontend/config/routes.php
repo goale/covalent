@@ -9,22 +9,11 @@
 return [
     'enablePrettyUrl' => true,
     'showScriptName' => false,
+    'enableStrictParsing' => true,
+
     'rules' => [
         [
-            'class' => 'yii\rest\UrlRule',
-            'controller' => 'project',
-            'except' => ['options'],
-            'extraPatterns' => [
-                'GET new' => 'new'
-            ]
+            'class' => 'frontend\components\ProjectUrlRule',
         ],
-        [
-            'class' => 'yii\rest\UrlRule',
-            'controller' => 'group',
-            'except' => ['options'],
-            'extraPatterns' => [
-                'GET new' => 'new'
-            ]
-        ]
-    ]
+    ],
 ];

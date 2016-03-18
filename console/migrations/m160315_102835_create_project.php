@@ -10,6 +10,7 @@ class m160315_102835_create_project extends Migration
             'id' => $this->primaryKey(),
             'name' => $this->string()->notNull()->unique(),
             'code' => $this->string()->notNull()->unique(),
+            'slug' => $this->string()->notNull()->unique(),
             'active' => $this->boolean()->defaultValue(true),
             'public' => $this->boolean()->defaultValue(false),
             'description' => $this->text(),

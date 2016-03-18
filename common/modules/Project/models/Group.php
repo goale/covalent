@@ -1,6 +1,6 @@
 <?php
 
-namespace common\models;
+namespace common\modules\Project\models;
 
 use Yii;
 use yii\db\ActiveRecord;
@@ -56,6 +56,12 @@ class Group extends ActiveRecord
     public function getProjects()
     {
         return $this->hasMany(Project::className(), ['group_id' => 'id']);
+    }
+    
+    
+    public static function findByCode($code)
+    {
+        return static::findOne(['code' => $code]);
     }
     
     public function addGroup()

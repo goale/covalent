@@ -1,8 +1,8 @@
 <?php
 
-namespace frontend\controllers;
+namespace common\modules\Project\controllers;
 
-use common\models\Group;
+use common\modules\Project\models\Group;
 use Yii;
 use yii\helpers\Url;
 use yii\web\Controller;
@@ -44,7 +44,6 @@ class GroupController extends Controller
 
     public function actionView($id)
     {
-        var_dump($id);
         return $this->render('show');
     }
 

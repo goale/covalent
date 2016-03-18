@@ -6,10 +6,10 @@
  * Time: 15:34
  */
 
-namespace frontend\controllers;
+namespace common\modules\Project\controllers;
 
 
-use common\models\Project;
+use common\modules\Project\models\Project;
 use Yii;
 use yii\helpers\Url;
 use yii\web\Controller;
@@ -18,18 +18,14 @@ class ProjectController extends Controller
 {
     public function actionIndex()
     {
-        $projects = Project::find()
-            ->select(['id', 'name', 'code'])
-            ->where(['active' => Project::STATUS_ACTIVE])
-            ->asArray()
-            ->all();
+        $projects = Project::getAll();
         
         return $this->render('index', ['projects' => $projects]);
     }
     
-    public function actionView($id)
+    public function actionShow($user, $project)
     {
-        return $this->render('project', ['projectId' => $id]);
+        return $this->render('project');
     }
 
     public function actionNew()

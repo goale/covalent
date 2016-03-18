@@ -1,8 +1,10 @@
 <?php
 
-namespace common\models;
+namespace common\modules\Project\models;
 
+use common\models\User;
 use Yii;
+use yii\db\ActiveRecord;
 use yii\helpers\BaseInflector;
 
 /**
@@ -11,6 +13,7 @@ use yii\helpers\BaseInflector;
  * @property integer $id
  * @property string $name
  * @property string $code
+ * @property string $slug
  * @property integer $active
  * @property string $description
  * @property string $url
@@ -22,7 +25,7 @@ use yii\helpers\BaseInflector;
  *
  * @property User $user
  */
-class Project extends \yii\db\ActiveRecord
+class Project extends ActiveRecord
 {
     const STATUS_ACTIVE = 1;
 
@@ -40,14 +43,15 @@ class Project extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'code'], 'required'],
+            [['name', 'code', 'slug'], 'required'],
             [['active', 'user_id', 'group_id'], 'integer'],
             [['description'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
             [['name', 'code', 'url', 'source_url'], 'string', 'max' => 255],
             [['url', 'source_url'], 'url'],
             [['name'], 'unique'],
-            [['code'], 'unique']
+            [['code'], 'unique'],
+            [['slug'], 'unique'],
         ];
     }
 
@@ -58,17 +62,58 @@ class Project extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'name' => 'Name',
-            'code' => 'Code',
-            'active' => 'Active',
-            'description' => 'Description',
-            'url' => 'Project URL',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
-            'source_url' => 'Source URL',
+            'name' => Yii::t('app', 'Name'),
+            'code' => Yii::t('app', 'Code'),
+            'slug' => Yii::t('app', 'Slug'),
+            'active' => Yii::t('app', 'Active'),
+            'description' => Yii::t('app', 'Description'),
+            'url' => Yii::t('app', 'Project Url'),
+            'created_at' => Yii::t('app', 'Created At'),
+            'updated_at' => Yii::t('app', 'Updated At'),
+            'source_url' => Yii::t('app', 'Source Url'),
             'user_id' => 'User ID',
             'group_id' => 'Group ID',
         ];
+    }
+
+    /**
+     * Gets all active projects
+     *
+     * @return array|\yii\db\ActiveRecord[]
+     */
+    public static function getAll()
+    {
+        return static::find()
+            ->select(['id', 'name', 'code'])
+            ->where(['active' => self::STATUS_ACTIVE])
+            ->asArray()
+            ->all();
+    }
+
+    /**
+     * Finds project by code
+     * 
+     * @param $code
+     * @return null|static
+     */
+    public static function findByCode($code)
+    {
+        return static::findOne(['code' => $code]);
+    }
+
+    /**
+     * Finds project by slug
+     *
+     * @param $slug
+     * @return null|static
+     */
+    public static function findBySlug($slug)
+    {
+        if (empty($slug) || !is_string($slug)) {
+            return null;
+        }
+
+        return static::findOne(['slug' => $slug]);
     }
 
     /**
