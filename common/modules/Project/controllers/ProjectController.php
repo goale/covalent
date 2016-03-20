@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: agoncharov
- * Date: 15.03.16
- * Time: 15:34
- */
 
 namespace common\modules\Project\controllers;
 
@@ -20,6 +14,13 @@ class ProjectController extends Controller
     {
         $projects = Project::getAll();
         
+        return $this->render('index', ['projects' => $projects]);
+    }
+
+    public function actionExplore()
+    {
+        $projects = Project::getPublic();
+
         return $this->render('index', ['projects' => $projects]);
     }
     

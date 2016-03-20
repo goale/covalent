@@ -37,6 +37,11 @@ class Project extends ActiveRecord
         return '{{%projects}}';
     }
 
+    public static function getPublic()
+    {
+        return static::findAll(['active' => true]);
+    }
+
     /**
      * @inheritdoc
      */
@@ -85,7 +90,7 @@ class Project extends ActiveRecord
     {
         return static::find()
             ->select(['id', 'name', 'code'])
-            ->where(['active' => self::STATUS_ACTIVE])
+            ->where(['active' => true])
             ->asArray()
             ->all();
     }

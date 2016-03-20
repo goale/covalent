@@ -21,20 +21,10 @@ class m160315_102835_create_project extends Migration
             'user_id' => $this->integer(),
             'group_id' => $this->integer(),
         ]);
-
-        $this->addForeignKey('project_user_fk', '{{%projects}}', 'user_id', 'users', 'id');
-
-        $this->createIndex('project_user', '{{%projects}}', ['user_id']);
-        $this->createIndex('project_group', '{{%projects}}', ['group_id']);
     }
 
     public function down()
     {
-        $this->dropForeignKey('project_user_fk', '{{%projects}}');
-        
-        $this->dropIndex('project_user', '{{%projects}}');
-        $this->dropIndex('project_group', '{{%projects}}');
-
         $this->dropTable('{{%projects}}');
     }
 }

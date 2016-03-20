@@ -6,7 +6,6 @@
 
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
-use yii\captcha\Captcha;
 
 $this->title = 'Add group';
 $this->params['breadcrumbs'] = [
@@ -28,6 +27,7 @@ $this->params['breadcrumbs'] = [
             ]); ?>
 
             <?= $form->field($model, 'name')->textInput(['autofocus' => true]) ?>
+            <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 
             <div class="form-group">
                 <?= Html::submitButton('Add group', ['class' => 'btn btn-primary', 'name' => 'add-group-button']) ?>

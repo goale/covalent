@@ -10,15 +10,22 @@ class m160316_085111_create_group extends Migration
             'id' => $this->primaryKey(),
             'name' => $this->string()->notNull()->unique(),
             'code' => $this->string()->notNull()->unique(),
+            'description' => $this->text(),
+            'created_at' => $this->timestamp(),
+            'updated_at' => $this->timestamp()
         ]);
-        
-        $this->addForeignKey('fk_project_group', 'projects', 'group_id', '{{%groups}}', 'id');
+
+        $this->createTable('{{%group_user}}', [
+            'id' => $this->primaryKey(),
+            'group_id' => $this->integer()->notNull(),
+            'user_id' => $this->integer()->notNull(),
+            'role_id' => $this->integer()->notNull()->defaultValue(1),
+        ]);
     }
 
     public function down()
     {
-        $this->dropForeignKey('fk_project_group', '{{%groups}}');
-        
+        $this->dropTable('{{%group_user}}');
         $this->dropTable('{{%groups}}');
     }
 }

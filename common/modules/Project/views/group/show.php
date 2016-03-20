@@ -1,9 +1,13 @@
 <?php
 /* @var $this yii\web\View */
-?>
-<h1>group/show</h1>
+/** @var Group $group */
 
-<p>
-    You may change the content of this page by modifying
-    the file <code><?= __FILE__; ?></code>.
-</p>
+use common\modules\Project\models\Group;
+use yii\helpers\Html;
+
+$this->title = $group['name'];
+?>
+<h1><?= Html::encode($this->title) ?></h1>
+<div class="group-description">
+    <?= Html::encode($group['description']) ?>
+</div>

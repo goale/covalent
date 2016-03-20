@@ -3,17 +3,13 @@
 namespace common\modules\Project\controllers;
 
 use common\modules\Project\models\Group;
-use Yii;
+use yii;
 use yii\helpers\Url;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 
 class GroupController extends Controller
 {
-    public function actionAddGroup()
-    {
-        return $this->render('add-group');
-    }
-    
     public function actionNew()
     {
         $model = new Group();
@@ -34,17 +30,17 @@ class GroupController extends Controller
 
     public function actionIndex()
     {
-        $groups = Group::find()
-            ->select(['id', 'name', 'code'])
-            ->asArray()
-            ->all();
-        
-        return $this->render('index', ['groups' => $groups]);
+        return $this->render('index', ['groups' => Group::getGroups()]);
     }
 
-    public function actionView($id)
+    public function actionShow($code)
     {
-        return $this->render('show');
+        $group = Group::findByCode($code);
+
+        if (!$group) {
+            throw new NotFoundHttpException();
+        }
+        return $this->render('show', ['group' => $group]);
     }
 
 }

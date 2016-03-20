@@ -103,3 +103,22 @@ a.desc:after {
 .nav > li > form > button:hover {
     text-decoration: none;
 }
+
+/* Groups */
+.groups-container .new-group {
+    text-align: right;
+    padding-top: 25px;
+}
+
+.groups-container .group-item {
+    padding: 15px 0;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.groups-container .group-item a {
+    font-weight: bold;
+}
+
+.groups-container .group-item__info {
+    color: gray;
+}

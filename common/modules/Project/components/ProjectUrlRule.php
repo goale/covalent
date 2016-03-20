@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: alex
- * Date: 3/18/16
- * Time: 12:37 PM
- */
 
 namespace common\modules\Project\components;
 
@@ -46,18 +40,8 @@ class ProjectUrlRule implements UrlRuleInterface
             }
 
             if (isset($params['project'])) {
-                return ['project/show', $params];
+                return ['project/project/show', $params];
             }
-
-            if (isset($params['user'])) {
-                // TODO: redirect to /users/user
-            }
-
-            if (isset($params['group'])) {
-                // TODO: redirect to /groups/group
-            }
-
-
         }
 
         return false;

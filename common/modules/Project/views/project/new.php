@@ -24,7 +24,7 @@ $this->params['breadcrumbs'] = [
         <div class="col-lg-5">
             <?php $form = ActiveForm::begin([
                 'id' => 'contact-form',
-                'action' => \yii\helpers\Url::to(['project/index'])
+                'action' => \yii\helpers\Url::to(['project/explore'])
             ]); ?>
 
             <?= $form->field($model, 'name')->textInput(['autofocus' => true]) ?>
@@ -33,7 +33,7 @@ $this->params['breadcrumbs'] = [
 
             <?= $form->field($model, 'source_url') ?>
 
-            <?= $form->field($model, 'description')->textArea(['rows' => 6]) ?>
+            <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 
             <div class="form-group">
                 <?= Html::submitButton('Add', ['class' => 'btn btn-primary', 'name' => 'add-project-button']) ?>
