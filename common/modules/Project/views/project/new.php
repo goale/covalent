@@ -3,10 +3,12 @@
 /* @var $this yii\web\View */
 /* @var $form yii\bootstrap\ActiveForm */
 /* @var $model \frontend\models\ContactForm */
+/* @var $group \common\modules\Project\models\Group */
+/* @var $storeInGroup boolean */
+/* @var $namespace string */
 
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
-use yii\captcha\Captcha;
 
 $this->title = 'Add project';
 $this->params['breadcrumbs'] = [
@@ -27,7 +29,17 @@ $this->params['breadcrumbs'] = [
                 'action' => \yii\helpers\Url::to(['project/explore'])
             ]); ?>
 
-            <?= $form->field($model, 'name')->textInput(['autofocus' => true]) ?>
+            <div class="form-group">
+                <?= $form->field($model, 'name', [
+                        'template' => "{label}\n<div class=\"input-group\"><div class=\"input-group-addon\">$namespace/</div>\n{input}</div>{error}"
+                    ])->textInput(['autofocus' => true]) ?>
+            </div>
+
+            <?php if ($storeInGroup): ?>
+                <?= $form->field($model, 'group_id')->hiddenInput()->label(false) ?>
+            <?php else: ?>
+                <?= $form->field($model, 'public')->checkbox() ?>
+            <?php endif; ?>
 
             <?= $form->field($model, 'url') ?>
 

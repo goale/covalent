@@ -15,6 +15,7 @@ use yii\helpers\BaseInflector;
  * @property string $code
  * @property string $slug
  * @property integer $active
+ * @property integer $public
  * @property string $description
  * @property string $url
  * @property string $created_at
@@ -49,7 +50,7 @@ class Project extends ActiveRecord
     {
         return [
             [['name', 'code', 'slug'], 'required'],
-            [['active', 'user_id', 'group_id'], 'integer'],
+            [['active', 'user_id', 'group_id', 'public'], 'integer'],
             [['description'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
             [['name', 'code', 'url', 'source_url'], 'string', 'max' => 255],
@@ -70,6 +71,7 @@ class Project extends ActiveRecord
             'name' => Yii::t('app', 'Name'),
             'code' => Yii::t('app', 'Code'),
             'slug' => Yii::t('app', 'Slug'),
+            'public' => Yii::t('app', 'Public'),
             'active' => Yii::t('app', 'Active'),
             'description' => Yii::t('app', 'Description'),
             'url' => Yii::t('app', 'Project Url'),
@@ -128,11 +130,25 @@ class Project extends ActiveRecord
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
-    
+
     public function add()
     {
         $this->code = BaseInflector::slug(BaseInflector::transliterate($this->name), '-');
         $this->user_id = Yii::$app->user->id;
+
+        if ($this->group_id > 0) {
+            if ($group = Group::findOne($this->group_id)) {
+                // TODO: check rights
+                $this->slug = '/' . $group['code'] . '/' . $this->code;
+                $this->public = 0;
+            } else {
+                $this->group_id = null;
+            }
+        }
+
+        if (strlen($this->slug) <= 0) {
+            $this->slug = '/' . Yii::$app->user->identity->username . '/' . $this->code;
+        }
 
         if (!$this->validate()) {
             return false;

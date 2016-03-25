@@ -10,11 +10,13 @@ class Module extends \yii\base\Module implements BootstrapInterface
     public $controllerNamespace = 'common\modules\Project\controllers';
 
     public $urlRules = [
-        'projects' => 'project/project/explore',
         'GET groups' => 'project/group/index',
         'POST groups' => 'project/group/create',
         'groups/new' => 'project/group/new',
         'groups/<code>' => 'project/group/show',
+        'GET projects' => 'project/project/explore',
+        'POST projects' => 'project/project/create',
+        'projects/new' => 'project/project/new',
         [
             'class' => 'common\modules\Project\components\ProjectUrlRule'
         ],

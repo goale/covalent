@@ -3,6 +3,7 @@
 namespace common\modules\Project\controllers;
 
 
+use common\modules\Project\models\Group;
 use common\modules\Project\models\Project;
 use Yii;
 use yii\helpers\Url;
@@ -32,8 +33,23 @@ class ProjectController extends Controller
     public function actionNew()
     {
         $model = new Project();
+        $namespace = Yii::$app->user->identity->username;
+        $storeInGroup = false;
 
-        return $this->render('new', ['model' => $model]);
+        if ($groupId = Yii::$app->request->get('group')) {
+            // TODO: check rights
+            if ($group = Group::findOne($groupId)) {
+                $model->group_id = $group['id'];
+                $namespace = $group->code;
+                $storeInGroup = true;
+            }
+        }
+
+        return $this->render('new', [
+            'model' => $model,
+            'namespace' => $namespace,
+            'storeInGroup' => $storeInGroup,
+        ]);
     }
     
     public function actionCreate()
@@ -42,7 +58,8 @@ class ProjectController extends Controller
         if ($model->load(\Yii::$app->request->post())) {
             if ($model->add()) {
                 Yii::$app->session->setFlash('success', 'Project successfully created.');
-                return $this->redirect(Url::to(['project/index']));
+
+                return $this->redirect($model->slug);
             }
         }
 

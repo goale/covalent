@@ -122,3 +122,14 @@ a.desc:after {
 .groups-container .group-item__info {
     color: gray;
 }
+
+.group-description__projects {
+    position: relative;
+    margin-top: 20px;
+}
+
+.group-description__projects-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
