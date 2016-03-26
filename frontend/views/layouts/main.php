@@ -60,11 +60,24 @@ AppAsset::register($this);
     ?>
 
     <div class="container">
-        <?= Breadcrumbs::widget([
-            'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
-        ]) ?>
-        <?= Alert::widget() ?>
-        <?= $content ?>
+        <div class="col-md-2">
+            <?php
+            $navItems = [
+                ['label' => 'Groups', 'url' => ['/groups']],
+            ];
+            echo Nav::widget([
+                'options' => ['class' => 'nav nav-pills nav-stacked'],
+                'items' => $navItems
+            ]);
+            ?>
+        </div>
+        <div class="col-md-10">
+            <?= Breadcrumbs::widget([
+                'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
+            ]) ?>
+            <?= Alert::widget() ?>
+            <?= $content ?>
+        </div>
     </div>
 </div>
 

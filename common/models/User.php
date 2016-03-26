@@ -1,6 +1,7 @@
 <?php
 namespace common\models;
 
+use common\modules\Project\models\Group;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
@@ -31,7 +32,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function tableName()
     {
-        return '{{%user}}';
+        return '{{%users}}';
     }
 
     /**
@@ -123,6 +124,12 @@ class User extends ActiveRecord implements IdentityInterface
     public function getId()
     {
         return $this->getPrimaryKey();
+    }
+
+    public function getGroups()
+    {
+        return $this->hasMany(Group::className(), ['id' => 'group_id'])
+            ->viaTable('group_user', ['user_id' => 'id']);
     }
 
     /**
