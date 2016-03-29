@@ -90,13 +90,22 @@ class Group extends ActiveRecord
     public static function getGroups()
     {
         $result = [];
-        $query = self::find()->select(['id', 'name', 'code'])->with('projects')->with('users');
-        foreach ($query->all() as $group) {
+
+        if (Yii::$app->user->identity->role == User::ROLE_ADMIN) {
+            $query = self::find()->select(['id', 'name', 'code'])->with('projects')->with('users');
+            $groups = $query->all();
+        } else {
+            $groups = User::findOne(Yii::$app->user->id)->groups;
+        }
+
+        foreach ($groups as $group) {
             $result[$group->id] = [
                 'name' => $group->name,
                 'code' => $group->code,
                 'users' => count($group->users),
-                'projects' => count($group->projects),
+//                'projects' => count($group->projects),
+//                'users' => 0,
+                'projects' => 2,
             ];
         }
 

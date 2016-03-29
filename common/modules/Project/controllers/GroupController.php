@@ -4,12 +4,30 @@ namespace common\modules\Project\controllers;
 
 use common\modules\Project\models\Group;
 use yii;
+use yii\filters\AccessControl;
 use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
 class GroupController extends Controller
 {
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['index', 'show', 'new', 'create'],
+                        'roles' => ['@'],
+                    ]
+
+                ]
+            ],
+        ];
+    }
+
     public function actionNew()
     {
         $model = new Group();
@@ -37,10 +55,11 @@ class GroupController extends Controller
     {
         $group = Group::findByCode($code);
 
-        if (!$group) {
-            throw new NotFoundHttpException();
+        if ($group && Yii::$app->user->can('viewGroup', ['groupId' => $group->id])) {
+            return $this->render('show', ['group' => $group]);
         }
-        return $this->render('show', ['group' => $group]);
+
+        throw new NotFoundHttpException('Group not found');
     }
 
 }

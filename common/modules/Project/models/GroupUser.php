@@ -13,7 +13,7 @@ use yii\db\ActiveRecord;
  * @property integer $user_id
  * @property integer $role_id
  */
-class GroupsUsers extends ActiveRecord
+class GroupUser extends ActiveRecord
 {
     /**
      * @inheritdoc

@@ -1,5 +1,6 @@
 <?php
 
+use common\models\User;
 use yii\db\Migration;
 
 class m160316_085111_create_group extends Migration
@@ -19,7 +20,7 @@ class m160316_085111_create_group extends Migration
             'id' => $this->primaryKey(),
             'group_id' => $this->integer()->notNull(),
             'user_id' => $this->integer()->notNull(),
-            'role_id' => $this->integer()->notNull()->defaultValue(1),
+            'role_id' => $this->integer()->notNull()->defaultValue(User::ROLE_MASTER),
         ]);
     }
 

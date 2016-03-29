@@ -1,12 +1,11 @@
 <?php
 
-namespace common\modules\Project\controllers;
+namespace common\commands\Project\controllers;
 
 
 use common\modules\Project\models\Group;
 use common\modules\Project\models\Project;
-use Yii;
-use yii\helpers\Url;
+use yii;
 use yii\web\Controller;
 
 class ProjectController extends Controller
@@ -25,7 +24,7 @@ class ProjectController extends Controller
         return $this->render('index', ['projects' => $projects]);
     }
     
-    public function actionShow($user, $project)
+    public function actionShow($project)
     {
         return $this->render('project');
     }
