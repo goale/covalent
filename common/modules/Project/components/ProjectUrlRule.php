@@ -2,8 +2,8 @@
 
 namespace common\modules\Project\components;
 
+use common\models\Group;
 use common\models\User;
-use common\modules\Project\models\Group;
 use common\modules\Project\models\Project;
 use yii\web\Request;
 use yii\web\UrlManager;

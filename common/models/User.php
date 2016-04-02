@@ -1,8 +1,7 @@
 <?php
 namespace common\models;
 
-use common\modules\Project\models\Group;
-use Yii;
+use yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;

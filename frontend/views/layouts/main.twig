@@ -1,0 +1,34 @@
+{{ register_asset_bundle('frontend/assets/AppAsset') }}
+{{ void(this.beginPage()) }}
+<!DOCTYPE html>
+<html lang="{{ app.language }}">
+    <head>
+        <meta charset="{{ app.charset }}">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{{ html.encode(this.title) }}</title>
+        {{ html.csrfMetaTags | raw }}
+        {{ void(this.head) }}
+    </head>
+    <body>
+        {{ void(this.beginBody()) }}
+        <nav class="navbar navbar-default">
+            <div class="container">
+                <a href="/" class="navbar-brand">Covalent</a>
+                {% if app.user.isGuest %}
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="/site/login">Login</a></li>
+                        <li><a href="/site/signup">Signup</a></li>
+                    </ul>
+                {% else %}
+                    <p class="navbar-text navbar-right">Signed as Otto</p>
+                {% endif %}
+            </div>
+        </nav>
+        <div class="container">
+            {{ content | raw }}
+        </div>
+
+        {{ void(this.endBody()) }}
+    </body>
+</html>
+{{ void(this.endPage()) }}
