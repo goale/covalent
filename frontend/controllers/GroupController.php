@@ -1,8 +1,8 @@
 <?php
 
-namespace common\modules\Project\controllers;
+namespace frontend\controllers;
 
-use common\modules\Project\models\Group;
+use common\models\Group;
 use yii;
 use yii\helpers\Url;
 use yii\web\Controller;
@@ -10,6 +10,8 @@ use yii\web\NotFoundHttpException;
 
 class GroupController extends Controller
 {
+    public $layout = 'main.twig';
+
     public function actionNew()
     {
         $model = new Group();

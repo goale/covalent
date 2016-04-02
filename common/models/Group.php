@@ -1,8 +1,8 @@
 <?php
 
-namespace common\modules\Project\models;
+namespace common\models;
 
-use common\models\User;
+use common\modules\Project\models\Project;
 use yii;
 use yii\db\ActiveRecord;
 use yii\helpers\BaseInflector;
