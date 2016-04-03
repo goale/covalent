@@ -104,6 +104,44 @@ a.desc:after {
     text-decoration: none;
 }
 
+.breadcrumb {
+    padding: 12px 0;
+    font-size: 18px;
+    margin: 0;
+}
+
+.highlight {
+    padding: 9px 14px;
+    background-color: #f7f7f9;
+    border: 1px solid #e1e1e8;
+    border-radius: 4px;
+}
+
+.zero-preview {
+    position: relative;
+}
+
+.preview-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 10;
+    display: block;
+    padding: 5px 8px;
+    font-size: 12px;
+    color: #767676;
+    cursor: pointer;
+    background-color: #fff;
+    border: 1px solid #e1e1e8;
+    border-radius: 0 4px 0 4px;
+}
+
+.preview-btn:hover, .preview-btn-active {
+    color: #fff;
+    background: #563d7c;
+    border: 1px solid #563d7c;
+}
+
 /* Groups */
 .groups-container .new-group {
     text-align: right;
@@ -132,4 +170,17 @@ a.desc:after {
     position: absolute;
     top: 0;
     right: 0;
+}
+
+/* Groups new */
+.group-new textarea, .group-new__preview {
+    height: 400px;
+}
+
+.group-new__preview {
+    display: none;
+}
+
+.group-new textarea {
+    resize: none;
 }

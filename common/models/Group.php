@@ -119,7 +119,7 @@ class Group extends ActiveRecord
 
         if (!Yii::$app->user->isGuest) {
             $user = User::findOne(Yii::$app->user->id);
-            $this->link('users', $user);
+            $this->link('users', $user, ['role_id' => 40]);
         }
 
         return $saved;
