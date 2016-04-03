@@ -15,7 +15,7 @@ class GroupController extends Controller
     public function actionNew()
     {
         $model = new Group();
-        return $this->render('new', ['model' => $model]);
+        return $this->render('new.twig', ['model' => $model]);
     }
 
     public function actionCreate()
@@ -27,7 +27,7 @@ class GroupController extends Controller
                 return $this->redirect(Url::to(['group/index']));
             }
         }
-        return $this->render('create');
+        return $this->render('new.twig', ['model' => $model]);
     }
 
     public function actionIndex()
