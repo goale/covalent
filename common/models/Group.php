@@ -17,6 +17,7 @@ use yii\helpers\BaseInflector;
  *
  * @property Project[] $projects
  * @property User[] $users
+ * @property GroupUser[] $groupUsers
  */
 class Group extends ActiveRecord
 {
@@ -72,6 +73,14 @@ class Group extends ActiveRecord
             ->viaTable('group_user', ['group_id' => 'id']);
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getGroupUsers()
+    {
+        return $this->hasMany(GroupUser::className(), ['group_id' => 'id']);
+    }
+
 
     /**
      * Finds group by code
@@ -119,6 +128,7 @@ class Group extends ActiveRecord
     public function addGroup()
     {
         $this->code = BaseInflector::slug(BaseInflector::transliterate($this->name), '-');
+        //$this->users++;
 
         if (!$this->validate()) {
             return false;
@@ -128,7 +138,7 @@ class Group extends ActiveRecord
 
         if (!Yii::$app->user->isGuest) {
             $user = User::findOne(Yii::$app->user->id);
-            $this->link('users', $user, ['role_id' => 40]);
+            $this->link('users', $user, ['role_id' => User::ROLE_MASTER]);
         }
 
         return $saved;

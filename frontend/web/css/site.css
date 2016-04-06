@@ -142,6 +142,17 @@ a.desc:after {
     border: 1px solid #563d7c;
 }
 
+.glyph-btn {
+    border: 1px solid #ddd;
+    padding: 12px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.glyph-btn:hover {
+    background: #efefef;
+}
+
 /* Groups */
 .groups-container .new-group {
     text-align: right;
@@ -183,4 +194,30 @@ a.desc:after {
 
 .group-new textarea {
     resize: none;
+}
+
+/* Groups detail */
+.group-detail__description {
+    padding-left: 25px;
+    padding-bottom: 25px;
+    margin-bottom: 40px;
+}
+
+.group-detail__users-item {
+    position: relative;
+    padding: 20px 0;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.group-detail__users-item > div {
+    display: inline-block;
+}
+
+.group-detail__users-role {
+    width: 200px;
+    display: inline-block;
+}
+
+.group-detail__users-add {
+    padding: 20px 0;
 }

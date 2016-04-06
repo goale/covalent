@@ -34,6 +34,11 @@ class GroupUser extends ActiveRecord
         ];
     }
 
+    public function getUsers()
+    {
+        return $this->hasMany(User::className(), ['id' => 'user_id']);
+    }
+
     /**
      * @inheritdoc
      */
