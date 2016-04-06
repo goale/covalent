@@ -14,6 +14,9 @@ use yii\helpers\BaseInflector;
  * @property string $name
  * @property string $code
  * @property string $description
+ * @property integer $user_id
+ * @property integer $projects_count
+ * @property integer $users_count
  *
  * @property Project[] $projects
  * @property User[] $users
@@ -111,9 +114,8 @@ class Group extends ActiveRecord
             $result[$group->id] = [
                 'name' => $group->name,
                 'code' => $group->code,
-                'users' => count($group->users),
 //                'projects' => count($group->projects),
-//                'users' => 0,
+                'users' => $group->users_count,
                 'projects' => 2,
             ];
         }
@@ -128,7 +130,8 @@ class Group extends ActiveRecord
     public function addGroup()
     {
         $this->code = BaseInflector::slug(BaseInflector::transliterate($this->name), '-');
-        //$this->users++;
+        $this->users_count++;
+        $this->user_id = Yii::$app->user->id;
 
         if (!$this->validate()) {
             return false;
@@ -142,5 +145,15 @@ class Group extends ActiveRecord
         }
 
         return $saved;
+    }
+
+    /**
+     * Checks if user had created a group
+     * @param $userId
+     * @return bool
+     */
+    public function isGroupOwner($userId)
+    {
+        return $this->user_id == $userId;
     }
 }
