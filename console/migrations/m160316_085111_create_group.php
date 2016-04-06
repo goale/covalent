@@ -11,8 +11,9 @@ class m160316_085111_create_group extends Migration
             'id' => $this->primaryKey(),
             'name' => $this->string()->notNull()->unique(),
             'code' => $this->string()->notNull()->unique(),
-            'users' => $this->integer()->notNull()->defaultValue(0),
-            'projects' => $this->integer()->notNull()->defaultValue(0),
+            'users_count' => $this->integer()->notNull()->defaultValue(0),
+            'projects_count' => $this->integer()->notNull()->defaultValue(0),
+            'user_id' => $this->integer()->notNull(),
             'description' => $this->text(),
             'created_at' => $this->timestamp(),
             'updated_at' => $this->timestamp()

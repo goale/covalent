@@ -14,9 +14,13 @@ use yii\helpers\BaseInflector;
  * @property string $name
  * @property string $code
  * @property string $description
+ * @property integer $user_id
+ * @property integer $projects_count
+ * @property integer $users_count
  *
  * @property Project[] $projects
  * @property User[] $users
+ * @property GroupUser[] $groupUsers
  */
 class Group extends ActiveRecord
 {
@@ -72,6 +76,14 @@ class Group extends ActiveRecord
             ->viaTable('group_user', ['group_id' => 'id']);
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getGroupUsers()
+    {
+        return $this->hasMany(GroupUser::className(), ['group_id' => 'id']);
+    }
+
 
     /**
      * Finds group by code
@@ -102,9 +114,8 @@ class Group extends ActiveRecord
             $result[$group->id] = [
                 'name' => $group->name,
                 'code' => $group->code,
-                'users' => count($group->users),
 //                'projects' => count($group->projects),
-//                'users' => 0,
+                'users' => $group->users_count,
                 'projects' => 2,
             ];
         }
@@ -119,6 +130,8 @@ class Group extends ActiveRecord
     public function addGroup()
     {
         $this->code = BaseInflector::slug(BaseInflector::transliterate($this->name), '-');
+        $this->users_count++;
+        $this->user_id = Yii::$app->user->id;
 
         if (!$this->validate()) {
             return false;
@@ -128,9 +141,19 @@ class Group extends ActiveRecord
 
         if (!Yii::$app->user->isGuest) {
             $user = User::findOne(Yii::$app->user->id);
-            $this->link('users', $user, ['role_id' => 40]);
+            $this->link('users', $user, ['role_id' => User::ROLE_MASTER]);
         }
 
         return $saved;
+    }
+
+    /**
+     * Checks if user had created a group
+     * @param $userId
+     * @return bool
+     */
+    public function isGroupOwner($userId)
+    {
+        return $this->user_id == $userId;
     }
 }

@@ -11,9 +11,13 @@ return [
                 'twig' => [
                     'class' => 'yii\twig\ViewRenderer',
                     'cachePath' => '@runtime/Twig/cache',
-                    'options' => [
+                    'options' => YII_DEBUG ? [
+                        'debug' => true,
                         'auto_reload' => true,
-                    ],
+                    ] : [],
+                    'extensions' => YII_DEBUG ? [
+                        '\Twig_Extension_Debug',
+                    ] : [],
                     'globals' => ['html' => '\yii\helpers\Html'],
                     'uses' => ['yii\bootstrap'],
                 ],

@@ -3,8 +3,8 @@
 namespace common\components\rbac;
 
 
+use common\models\GroupUser;
 use common\models\User;
-use common\modules\Project\models\GroupUser;
 use common\modules\Project\models\Project;
 use yii;
 use yii\rbac\Item;

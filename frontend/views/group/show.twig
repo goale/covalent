@@ -1,0 +1,66 @@
+{{ set(this, 'title', group.name) }}
+{{ set(this, 'params', { 'breadcrumbs' : [
+    { 'label' : 'Groups', 'url' : '/groups' },
+    { 'label' : this.title }
+    ] }) }}
+<div class="group-detail">
+    {% if group.description is defined %}
+    <div class="group-detail__description highlight">
+        {{ group.description | raw }}
+    </div>
+    {% endif %}
+    <div class="zero-preview">
+        <a
+            href="/projects/new?group={{ group.id }}"
+            class="btn btn-success group-description__projects-btn">
+                Add project
+        </a>
+    </div>
+    <ul class="nav nav-tabs">
+        <li role="presentation"><a href="#">Projects</a></li>
+        {% if canEdit %}
+            <li role="presentation" class="active"><a href="#">Users</a></li>
+        {% endif %}
+    </ul>
+    <div class="group-detail__projects" style="display: none">
+
+    </div>
+    {% if canEdit %}
+    <div class="group-detail__users">
+        {% for user in users %}
+            <div class="group-detail__users-item" data-user="{{ user.id }}" data-group="{{ group.id }}">
+                <div class="group-detail__users-item-first">
+                    <a href="#" target="_blank">
+                        {{ user.name }}
+                    </a>
+                </div>
+                <div>
+                    <select name="group_role" class="form-control group-detail__users-role">
+                        {% for id, role in roles %}
+                            <option value="{{ id }}" {{ id == user.role ? 'selected' }}>{{ role }}</option>
+                        {% endfor %}
+                    </select>
+                    <span class="glyph-btn group-detail__users-leave">
+                        <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
+                    </span>
+                </div>
+            </div>
+        {% endfor %}
+        <div class="group-detail__users-add">
+            <form name="group_user_add" class="form-inline" data-group="{{ group.id }}">
+                <select name="group_user" class="form-control">
+                    <option value="1">admin</option>
+                    <option value="2">oako</option>
+                    <option value="3">oakoae</option>
+                </select>
+                <select name="group_user_role" class="form-control">
+                    {% for id, role in roles %}
+                        <option value="{{ id }}">{{ role }}</option>
+                    {% endfor %}
+                </select>
+                <button class="btn btn-primary">Add</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+</div>
