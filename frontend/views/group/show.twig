@@ -27,6 +27,12 @@
     </div>
     {% if canEdit %}
     <div class="group-detail__users">
+        <div class="group-detail__users-item">
+            <a href="#" target="_blank">
+                {{  owner.username }}
+            </a>
+            <span>Owner</span>
+        </div>
         {% for user in users %}
             <div class="group-detail__users-item" data-user="{{ user.id }}" data-group="{{ group.id }}">
                 <div class="group-detail__users-item-first">

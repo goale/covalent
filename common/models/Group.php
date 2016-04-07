@@ -103,20 +103,18 @@ class Group extends ActiveRecord
     {
         $result = [];
 
-        if (Yii::$app->user->identity->role == User::ROLE_ADMIN) {
-            $query = self::find()->select(['id', 'name', 'code'])->with('projects')->with('users');
-            $groups = $query->all();
+        if (Yii::$app->user->can('isAdmin')) {
+            $groups = self::find()->select(['id', 'name', 'code', 'users_count', 'projects_count'])->all();
         } else {
-            $groups = User::findOne(Yii::$app->user->id)->groups;
+            $groups = self::find()->where(['user_id' => Yii::$app->user->id])->all();
         }
 
         foreach ($groups as $group) {
             $result[$group->id] = [
                 'name' => $group->name,
                 'code' => $group->code,
-//                'projects' => count($group->projects),
+                'projects' => $group->projects_count,
                 'users' => $group->users_count,
-                'projects' => 2,
             ];
         }
 
@@ -137,14 +135,7 @@ class Group extends ActiveRecord
             return false;
         }
 
-        $saved = $this->save();
-
-        if (!Yii::$app->user->isGuest) {
-            $user = User::findOne(Yii::$app->user->id);
-            $this->link('users', $user, ['role_id' => User::ROLE_MASTER]);
-        }
-
-        return $saved;
+        return $this->save();
     }
 
     /**

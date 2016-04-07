@@ -31,9 +31,8 @@ class GroupController extends Controller
                         'allow' => true,
                         'actions' => ['index', 'show', 'new', 'create', 'add-user', 'delete-user'],
                         'roles' => ['@'],
-                    ]
-
-                ]
+                    ],
+                ],
             ],
         ];
     }
@@ -88,13 +87,13 @@ class GroupController extends Controller
                     'id' => $user->id,
                     'name' => $user->username,
                     'role' => $roles[$user->id],
-//                    'isOwner' => $user->id == $group->user_id
                 ];
             }
 
             return $this->render('show.twig', [
                 'group' => $group,
                 'users' => $users,
+                'owner' => User::findOne($group->user_id),
                 'roles' => $this->roles,
                 'canEdit' => Yii::$app->user->can('editGroup', ['groupId' => $group->id]),
             ]);
@@ -127,6 +126,10 @@ class GroupController extends Controller
         $role = Yii::$app->request->post('group_user_role');
 
         $user = User::findOne($userId);
+
+        if (Group::findOne($group)->isGroupOwner($userId)) {
+            throw new yii\web\BadRequestHttpException('User is already a group owner');
+        }
 
         if (!isset($this->roles[$role]) || !$user) {
             throw new yii\base\InvalidParamException('User or role does not exist');
@@ -175,8 +178,6 @@ class GroupController extends Controller
         if (!Yii::$app->user->can('editGroup', ['groupId' => $group])) {
             throw new yii\web\ForbiddenHttpException();
         }
-
-        // TODO: check if user is owner
 
         $groupUser = GroupUser::findOne([
             'user_id' => Yii::$app->request->post('user'),

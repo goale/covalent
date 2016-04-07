@@ -8,9 +8,17 @@ return [
         'type' => 2,
         'description' => 'Edit group',
     ],
+    'ownGroup' => [
+        'type' => 2,
+        'description' => 'Own group',
+    ],
     'createGroup' => [
         'type' => 2,
         'description' => 'Create group',
+    ],
+    'isAdmin' => [
+        'type' => 2,
+        'description' => 'Is Admin',
     ],
     'user' => [
         'type' => 1,
@@ -42,11 +50,20 @@ return [
             'editGroup',
         ],
     ],
+    'owner' => [
+        'type' => 1,
+        'ruleName' => 'projectRole',
+        'children' => [
+            'master',
+            'ownGroup',
+        ],
+    ],
     'admin' => [
         'type' => 1,
         'ruleName' => 'projectRole',
         'children' => [
             'master',
+            'isAdmin',
         ],
     ],
 ];
