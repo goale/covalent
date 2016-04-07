@@ -29,10 +29,21 @@ class RbacController extends Controller
         $editGroup->description = 'Edit group';
         $auth->add($editGroup);
 
+        // Own group
+        $ownGroup = $auth->createPermission('ownGroup');
+        $ownGroup->description = 'Own group';
+        $auth->add($ownGroup);
+
         // Create group permission
         $createGroup = $auth->createPermission('createGroup');
         $createGroup->description = 'Create group';
         $auth->add($createGroup);
+
+        // Administrator permissions
+        $isAdmin = $auth->createPermission('isAdmin');
+        $isAdmin->description = 'Is Admin';
+        $auth->add($isAdmin);
+
 
         // TODO: project permissions
 
@@ -62,10 +73,18 @@ class RbacController extends Controller
         $auth->addChild($master, $tester);
         $auth->addChild($master, $editGroup);
 
-        // Create admin rule
+        // Create owner role
+        $owner = $auth->createRole('owner');
+        $owner->ruleName = $rule->name;
+        $auth->add($owner);
+        $auth->addChild($owner, $master);
+        $auth->addChild($owner, $ownGroup);
+
+        // Create admin role
         $admin = $auth->createRole('admin');
         $admin->ruleName = $rule->name;
         $auth->add($admin);
         $auth->addChild($admin, $master);
+        $auth->addChild($admin, $isAdmin);
     }
 }
