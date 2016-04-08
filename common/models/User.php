@@ -109,6 +109,24 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * Finds all active users except group owner
+     *
+     * @param $groupId
+     * @return array|yii\db\ActiveRecord[]
+     */
+    public static function findWithoutOwner($groupId)
+    {
+        $group = Group::findOne($groupId);
+
+        return User::find()
+            ->select(['id', 'username'])
+            ->where(['status' => User::STATUS_ACTIVE])
+            ->andWhere(['!=', 'id', $group->user_id])
+            ->asArray()
+            ->all();
+    }
+
+    /**
      * Finds out if password reset token is valid
      *
      * @param string $token password reset token

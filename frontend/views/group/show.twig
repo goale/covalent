@@ -33,7 +33,7 @@
             </a>
             <span>Owner</span>
         </div>
-        {% for user in users %}
+        {% for user in groupUsers %}
             <div class="group-detail__users-item" data-user="{{ user.id }}" data-group="{{ group.id }}">
                 <div class="group-detail__users-item-first">
                     <a href="#" target="_blank">
@@ -55,9 +55,10 @@
         <div class="group-detail__users-add">
             <form name="group_user_add" class="form-inline" data-group="{{ group.id }}">
                 <select name="group_user" class="form-control">
-                    <option value="1">admin</option>
-                    <option value="2">oako</option>
-                    <option value="3">oakoae</option>
+                    <option value="">Choose user</option>
+                    {% for user in users %}
+                        <option value="{{ user.id }}">{{ user.username }}</option>
+                    {% endfor %}
                 </select>
                 <select name="group_user_role" class="form-control">
                     {% for id, role in roles %}
