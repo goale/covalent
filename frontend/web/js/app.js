@@ -41,6 +41,7 @@ var GroupUserControls = {
     usersContainer: '.group-detail__users',
     userItem: '.group-detail__users-item',
     removeBtn: '.group-detail__users-leave',
+    roleSelect: '.group-detail__users-role',
 
     initialize: function () {
         var self = this;
@@ -55,6 +56,11 @@ var GroupUserControls = {
             self.removeUserFromGroup($item.data('user'), $item.data('group'), function () {
                 $item.remove();
             });
+        });
+
+        $(this.usersContainer).on('change', this.roleSelect, function () {
+            var $item = $(this).closest(self.userItem);
+            self.changeUserRole(self.$groupAddUserForm.data('group'), $item.data('user'), $(this).val());
         });
     },
 
@@ -71,6 +77,7 @@ var GroupUserControls = {
             }
         });
     },
+
     removeUserFromGroup: function (user, group, callback) {
         $.ajax({
             url: '/groups/' + group + '/users',
@@ -82,6 +89,15 @@ var GroupUserControls = {
                     callback();
                 }
             }
+        });
+    },
+
+    changeUserRole: function (group, user, role) {
+        $.ajax({
+            url: '/groups/' + group + '/users',
+            type: 'PATCH',
+            data: 'user=' + user + '&role=' + role,
+            dataType: 'json'
         });
     }
 };

@@ -29,7 +29,7 @@ class GroupController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['index', 'show', 'new', 'create', 'add-user', 'delete-user'],
+                        'actions' => ['index', 'show', 'new', 'create', 'add-user', 'delete-user', 'change-user-role'],
                         'roles' => ['@'],
                     ],
                 ],
@@ -199,6 +199,42 @@ class GroupController extends Controller
         }
 
         return ['success' => true];
+    }
+
+    /**
+     * @param $group
+     * @return bool
+     * @throws yii\web\BadRequestHttpException
+     * @throws yii\web\ForbiddenHttpException
+     */
+    public function actionChangeUserRole($group)
+    {
+        Yii::$app->response->format = yii\web\Response::FORMAT_JSON;
+
+        if (!Yii::$app->request->isAjax || !Yii::$app->request->isPatch) {
+            throw new yii\web\BadRequestHttpException();
+        }
+
+        if (!Yii::$app->user->can('editGroup', ['groupId' => $group])) {
+            throw new yii\web\ForbiddenHttpException();
+        }
+
+        $userId = Yii::$app->request->post('user');
+        $role = Yii::$app->request->post('role');
+
+        $groupUser = GroupUser::findOne(['group_id' => $group, 'user_id' => $userId]);
+
+        if (!$groupUser || !isset($this->roles[$role])) {
+            throw new yii\base\InvalidParamException('User or role does not exist');
+        }
+
+        if ($groupUser->role_id == $role) {
+            return true;
+        }
+
+        $groupUser->role_id = $role;
+
+        return $groupUser->save();
     }
 
 }
