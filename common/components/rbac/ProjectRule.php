@@ -31,8 +31,8 @@ class ProjectRule extends Rule
             $role = Yii::$app->user->identity->role;
         } else if (isset($params['project'])) {
             $role = $this->getUserRole($params['project']);
-        } else if (isset($params['groupId'])) {
-            $role = $this->getUserGroupRole($params['groupId']);
+        } else if (isset($params['group'])) {
+            $role = $this->getUserGroupRole($params['group']);
         } else {
             $role = Yii::$app->user->identity->role;
         }
@@ -68,19 +68,18 @@ class ProjectRule extends Rule
 
     /**
      * Gets user role in group
-     * @param int $groupId
+     * @param Group $group
      * @return int
      */
-    protected function getUserGroupRole($groupId)
+    protected function getUserGroupRole($group)
     {
-        $group = Group::findOne($groupId);
         $userId = Yii::$app->user->id;
 
         if ($group->isGroupOwner($userId)) {
             return User::ROLE_OWNER;
         }
 
-        if ($groupRole = GroupUser::findOne(['user_id' => $userId, 'group_id' => $groupId])) {
+        if ($groupRole = GroupUser::findOne(['user_id' => $userId, 'group_id' => $group->id])) {
             return $groupRole->role_id;
         }
 

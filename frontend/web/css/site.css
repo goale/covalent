@@ -154,21 +154,26 @@ a.desc:after {
 }
 
 /* Groups */
-.groups-container .new-group {
+.groups-list__btn-new {
     text-align: right;
     padding-top: 25px;
 }
 
-.groups-container .group-item {
+.groups-list__item {
     padding: 15px 0;
     border-bottom: 1px solid #e8e8e8;
 }
 
-.groups-container .group-item a {
+.groups-list__item-controls {
+    float: right;
+    line-height: 40px;
+}
+
+.groups-list__item a {
     font-weight: bold;
 }
 
-.groups-container .group-item__info {
+.groups-list__item .group-item__info {
     color: gray;
 }
 
