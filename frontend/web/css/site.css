@@ -71,7 +71,7 @@
 
 .groups-list__item-controls {
     float: right;
-    line-height: 40px;
+    padding-top: 2px;
 }
 
 .groups-list__item a {
