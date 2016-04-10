@@ -103,18 +103,28 @@ class Group extends ActiveRecord
     {
         $result = [];
 
-        if (Yii::$app->user->can('isAdmin')) {
-            $groups = self::find()->select(['id', 'name', 'code', 'users_count', 'projects_count'])->all();
-        } else {
-            $groups = self::find()->where(['user_id' => Yii::$app->user->id])->all();
+        $groups = self::find();
+
+        if (!Yii::$app->user->can('isAdmin')) {
+            $groups
+                ->joinWith('groupUsers')
+                ->where(['groups.user_id' => Yii::$app->user->id])
+                ->orWhere(['group_user.user_id' => Yii::$app->user->id]);
         }
 
-        foreach ($groups as $group) {
-            $result[$group->id] = [
+        foreach ($groups->each() as $group) {
+            if (!Yii::$app->user->can('isAdmin') && !empty($group->groupUsers)) {
+                $editable = $group->groupUsers[0]->role_id >= User::ROLE_MASTER;
+            } else {
+                $editable = $group->isGroupOwner(Yii::$app->user->id);
+            }
+
+            $result[] = [
                 'name' => $group->name,
                 'code' => $group->code,
                 'projects' => $group->projects_count,
                 'users' => $group->users_count,
+                'editable' => $editable,
             ];
         }
 
@@ -145,6 +155,6 @@ class Group extends ActiveRecord
      */
     public function isGroupOwner($userId)
     {
-        return $this->user_id == $userId;
+        return $this->user_id == $userId || Yii::$app->user->can('isAdmin');
     }
 }
