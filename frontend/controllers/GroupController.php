@@ -32,7 +32,7 @@ class GroupController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['index', 'show', 'new', 'create', 'add-user', 'delete-user', 'change-user-role'],
+                        'actions' => ['index', 'show', 'new', 'create', 'add-user', 'delete-user', 'change-user-role', 'edit', 'delete'],
                         'roles' => ['@'],
                     ],
                 ],
@@ -61,7 +61,52 @@ class GroupController extends Controller
                 return $this->redirect(Url::to(['group/index']));
             }
         }
-        return $this->render('new.twig', ['model' => $model]);
+        return $this->render('new.twig', compact('model'));
+    }
+
+    /**
+     * @param $code
+     * @return string
+     * @throws yii\web\ForbiddenHttpException
+     * @throws yii\web\ServerErrorHttpException
+     */
+    public function actionEdit($code)
+    {
+        // TODO: needs huge refactoring
+        $group = Group::findByCode($code);
+
+        if (Yii::$app->user->can('editGroup', compact('group'))) {
+            if (Yii::$app->request->isPatch) {
+                if (Yii::$app->request->isAjax && Yii::$app->request->post('type') == 'owner') {
+                    Yii::$app->response->format = yii\web\Response::FORMAT_JSON;
+                    if (!$group->isGroupOwner(Yii::$app->user->id)) {
+                        throw new yii\web\ForbiddenHttpException();
+                    }
+
+                    $group->user_id = Yii::$app->request->post('user');
+
+                    if ($group->save()) {
+                        return [
+                            'needRedirect' => !$group->isGroupOwner(Yii::$app->user->id),
+                        ];
+                    }
+
+                    throw new yii\web\ServerErrorHttpException();
+                } else {
+                    $group->load(Yii::$app->request->post());
+                    $group->save();
+                    return $this->redirect(Url::to(['group/show', 'code' => $group->code]));
+                }
+            }
+
+            $isOwner = $group->isGroupOwner(Yii::$app->user->id);
+
+            $users = User::findAll(['status' => User::STATUS_ACTIVE]);
+
+            return $this->render('edit.twig', compact('group', 'users', 'isOwner'));
+        }
+
+        throw new yii\web\ForbiddenHttpException('Permission denied');
     }
 
     /**
@@ -69,7 +114,32 @@ class GroupController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index.twig', ['groups' => Group::getGroups()]);
+        $groups = Group::getGroups();
+        return $this->render('index.twig', compact('groups'));
+    }
+
+    /**
+     * @param $code
+     * @return array
+     * @throws \Exception
+     * @throws yii\web\BadRequestHttpException
+     * @throws yii\web\ForbiddenHttpException
+     */
+    public function actionDelete($code)
+    {
+        Yii::$app->response->format = yii\web\Response::FORMAT_JSON;
+
+        $group = Group::findByCode($code);
+
+        if (!$group->isGroupOwner(Yii::$app->user->id)) {
+            throw new yii\web\ForbiddenHttpException();
+        }
+
+        if ($group->projects_count > 0) {
+            throw new yii\web\BadRequestHttpException();
+        }
+
+        return ['success' => $group->delete()];
     }
 
     /**
@@ -79,6 +149,7 @@ class GroupController extends Controller
      */
     public function actionShow($code)
     {
+        // TODO: needs refactoring
         $group = Group::findByCode($code);
 
         if (!empty($group->description)) {

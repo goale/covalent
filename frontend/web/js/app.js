@@ -5,15 +5,42 @@ $(document).ready(function () {
 
 var GroupForm = {
 
-    $previewBtn: $('.group-new__preview-btn'),
-    $descriptionInput: $('.group-new__description'),
-    $descriptionPreview: $('.group-new__preview'),
+    $groupForm: $('.group-form'),
+    $previewBtn: $('.group-form__preview-btn'),
+    $descriptionInput: $('.group-form__description'),
+    $descriptionPreview: $('.group-form__preview'),
+    $changeOwnerSelect: $('.group-form__owner-change'),
+    $changeOwnerBtn: $('.group-form__owner-change-btn'),
+    $deleteGroupBtn: $('.group-form__delete-btn'),
 
     previewMode: false,
 
     initialize: function () {
         this.$previewBtn.on('click', function () {
             this.togglePreview();
+        }.bind(this));
+
+        this.$changeOwnerSelect.on('change', function () {
+            this.$changeOwnerBtn.prop('disabled', false);
+        }.bind(this));
+
+        this.$changeOwnerBtn.on('click', function () {
+            var newOwner = this.$changeOwnerSelect.val(),
+                groupId = this.$groupForm.data('group'),
+                username = this.$changeOwnerSelect.children(':selected').text().trim();
+
+            if (prompt('Type selected username to confirm') === username) {
+                this.changeGroupOwner(groupId, newOwner);
+            }
+        }.bind(this));
+
+        this.$deleteGroupBtn.on('click', function () {
+            var groupId = this.$groupForm.data('group'),
+                name = this.$groupForm.data('name');
+
+            if (prompt('Type group name to confirm deletion') === name) {
+                this.deleteGroup(groupId);
+            }
         }.bind(this));
     },
 
@@ -30,6 +57,32 @@ var GroupForm = {
         this.$previewBtn.toggleClass('preview-btn-active');
 
         this.previewMode = !this.previewMode;
+    },
+
+    changeGroupOwner: function (group, user) {
+        $.ajax({
+            url: '/groups/' + group + '/edit',
+            data: 'type=owner&user=' + user,
+            type: 'PATCH',
+            dataType: 'json',
+            success: function (data) {
+                if (data.needRedirect) {
+                    window.location = '/groups';
+                }
+            }
+        });
+    },
+    deleteGroup: function (group) {
+        $.ajax({
+            url: '/groups/' + group + '/delete',
+            type: 'DELETE',
+            dataType: 'json',
+            success: function (data) {
+                if (data.success) {
+                    window.location = '/groups';
+                }
+            }
+        });
     }
 };
 
