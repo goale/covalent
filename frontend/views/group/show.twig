@@ -28,33 +28,18 @@
     {% if canEdit %}
     <div class="group-detail__users">
         <div class="group-detail__users-item">
-            <a href="#" target="_blank">
-                {{  owner.username }}
-            </a>
-            <span>Owner</span>
+            <div class="group-detail__users-item-first">
+                <a href="#" target="_blank">{{  owner.username }}</a>
+                <span class="label label-success">Owner</span>
+            </div>
+
         </div>
         {% for user in groupUsers %}
-            <div class="group-detail__users-item" data-user="{{ user.id }}" data-group="{{ group.id }}">
-                <div class="group-detail__users-item-first">
-                    <a href="#" target="_blank">
-                        {{ user.name }}
-                    </a>
-                </div>
-                <div>
-                    <select name="group_role" class="form-control group-detail__users-role">
-                        {% for id, role in roles %}
-                            <option value="{{ id }}" {{ id == user.role ? 'selected' }}>{{ role }}</option>
-                        {% endfor %}
-                    </select>
-                    <a class="glyph-btn group-detail__users-leave">
-                        <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
-                    </a>
-                </div>
-            </div>
+            {{ include('user.twig', { 'group': group.id, 'user' : user }) }}
         {% endfor %}
         <div class="group-detail__users-add">
-            <form name="group_user_add" class="form-inline" data-group="{{ group.id }}">
-                <select name="group_user" class="form-control">
+            <form name="group-user-add" class="form-inline" data-group="{{ group.id }}">
+                <select name="group_user" class="form-control group-detail__users-add-user">
                     <option value="">Choose user</option>
                     {% for user in users %}
                         <option value="{{ user.id }}">{{ user.username }}</option>
@@ -65,7 +50,8 @@
                         <option value="{{ id }}">{{ role }}</option>
                     {% endfor %}
                 </select>
-                <button class="btn btn-primary">Add</button>
+                <button class="btn btn-primary group-detail__users-add-btn" disabled>Add user</button>
+                <span class="group-detail__users-add-error text-danger"></span>
             </form>
         </div>
     </div>

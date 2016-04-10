@@ -116,7 +116,7 @@ class Group extends ActiveRecord
             if (!Yii::$app->user->can('isAdmin') && !empty($group->groupUsers)) {
                 $editable = $group->groupUsers[0]->role_id >= User::ROLE_MASTER;
             } else {
-                $editable = $group->isGroupOwner(Yii::$app->user->id);
+                $editable = $group->isGroupOwner(Yii::$app->user->id) || Yii::$app->user->can('isAdmin');
             }
 
             $result[] = [
@@ -155,6 +155,6 @@ class Group extends ActiveRecord
      */
     public function isGroupOwner($userId)
     {
-        return $this->user_id == $userId || Yii::$app->user->can('isAdmin');
+        return $this->user_id == $userId;
     }
 }

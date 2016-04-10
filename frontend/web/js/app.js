@@ -88,16 +88,26 @@ var GroupForm = {
 
 var GroupUserControls = {
 
-    $groupAddUserForm: $('form[name="group_user_add"]'),
+    $groupAddUserForm: $('form[name="group-user-add"]'),
     $usersAddForm: $('.group-detail__users-add'),
 
     usersContainer: '.group-detail__users',
     userItem: '.group-detail__users-item',
     removeBtn: '.group-detail__users-leave',
     roleSelect: '.group-detail__users-role',
+    userAddBtn: '.group-detail__users-add-btn',
+    errorBox: '.group-detail__users-add-error',
 
     initialize: function () {
         var self = this;
+
+        this.$usersAddForm.on('change', '.group-detail__users-add-user', function () {
+            if ($(this).val().length > 0) {
+                $(self.userAddBtn).prop('disabled', false);
+            } else {
+                $(self.userAddBtn).prop('disabled', true);
+            }
+        });
 
         this.$groupAddUserForm.submit(function () {
             self.addUserToGroup($(this).serialize());
@@ -118,6 +128,7 @@ var GroupUserControls = {
     },
 
     addUserToGroup: function (data) {
+        $(this.errorBox).text('');
         var self = this;
 
         $.ajax({
@@ -127,6 +138,11 @@ var GroupUserControls = {
             dataType: 'html',
             success: function (data) {
                 self.$usersAddForm.before(data);
+                self.$groupAddUserForm[0].reset();
+            },
+            error: function (xhr) {
+                var errorText = xhr.responseText.split(': ')[1];
+                $(self.errorBox).text(errorText);
             }
         });
     },

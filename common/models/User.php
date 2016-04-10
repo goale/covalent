@@ -121,6 +121,7 @@ class User extends ActiveRecord implements IdentityInterface
         return User::find()
             ->select(['id', 'username'])
             ->where(['status' => User::STATUS_ACTIVE])
+            ->andWhere(['<', 'role', self::ROLE_ADMIN])
             ->andWhere(['!=', 'id', $group->user_id])
             ->asArray()
             ->all();

@@ -99,7 +99,7 @@ class GroupController extends Controller
                 }
             }
 
-            $isOwner = $group->isGroupOwner(Yii::$app->user->id);
+            $isOwner = $group->isGroupOwner(Yii::$app->user->id) || Yii::$app->user->can('isAdmin');
 
             $users = User::findAll(['status' => User::STATUS_ACTIVE]);
 
@@ -131,7 +131,7 @@ class GroupController extends Controller
 
         $group = Group::findByCode($code);
 
-        if (!$group->isGroupOwner(Yii::$app->user->id)) {
+        if (!$group->isGroupOwner(Yii::$app->user->id) || !Yii::$app->user->can('isAdmin')) {
             throw new yii\web\ForbiddenHttpException();
         }
 
@@ -196,10 +196,10 @@ class GroupController extends Controller
      * Users in group must be unique
      * @param int $group
      * @return array
+     * @throws \HttpInvalidParamException
      * @throws yii\web\BadRequestHttpException
      * @throws yii\web\ForbiddenHttpException
      * @throws yii\web\ServerErrorHttpException
-     * @throws yii\base\InvalidParamException
      */
     public function actionAddUser($group)
     {
@@ -227,7 +227,7 @@ class GroupController extends Controller
         }
 
         if (GroupUser::findOne(['user_id' => $userId, 'group_id' => $group->id])) {
-            throw new yii\base\InvalidParamException('User is already in group');
+            throw new yii\web\BadRequestHttpException('User is already in group');
         }
 
         $userGroup = new GroupUser();

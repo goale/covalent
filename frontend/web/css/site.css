@@ -45,14 +45,17 @@
 }
 
 .glyph-btn {
+    display: block;
     border: 1px solid #ddd;
-    padding: 12px;
+    padding: 6px 8px;
     border-radius: 3px;
     cursor: pointer;
+    color: #999;
 }
 
 .glyph-btn:hover {
     background: #efefef;
+    color: #666;
 }
 
 /* Groups */
@@ -108,6 +111,10 @@
     margin-bottom: 20px;
 }
 
+.group-detail__users-add-error {
+    margin-left: 10px;
+}
+
 /* Groups detail */
 .group-detail__description {
     padding-left: 25px;
@@ -121,15 +128,26 @@
     border-bottom: 1px solid #e8e8e8;
 }
 
-.group-detail__users-item > div {
-    display: inline-block;
+.group-detail__users-item-first a {
+    line-height: 34px;
+    font-size: 18px;
+}
+
+.group-detail__users-item_controls {
+    float: right;
+    margin-left: 15px;
 }
 
 .group-detail__users-role {
-    width: 200px;
-    display: inline-block;
+    width: 150px;
+    display: inline;
 }
 
 .group-detail__users-add {
     padding: 20px 0;
+}
+
+.group-detail__users-add .form-control {
+    margin-right: 10px;
+    min-width: 150px;
 }
