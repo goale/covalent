@@ -14,7 +14,7 @@ use yii\rbac\Rule;
 class ProjectRule extends Rule
 {
 
-    public $name = 'projectRole';
+    public $name = 'projectRule';
 
     /**
      * Executes the rule.

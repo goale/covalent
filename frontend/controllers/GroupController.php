@@ -76,7 +76,7 @@ class GroupController extends Controller
         // TODO: needs huge refactoring
         $group = Group::findByCode($code);
 
-        if (Yii::$app->user->can('editGroup', compact('group'))) {
+        if (Yii::$app->user->can('editGroup', ['group' => $group])) {
             if (Yii::$app->request->isPatch) {
                 if (Yii::$app->request->post('type') == 'owner') {
                     return $this->changeGroupOwner($group);
@@ -85,7 +85,7 @@ class GroupController extends Controller
                 }
             }
 
-            $isOwner = Yii::$app->user->can('ownGroup', compact($group));
+            $isOwner = Yii::$app->user->can('ownGroup', ['group' => $group]);
 
             $users = User::findAll(['status' => User::STATUS_ACTIVE]);
 
@@ -105,7 +105,7 @@ class GroupController extends Controller
     {
         Yii::$app->response->format = yii\web\Response::FORMAT_JSON;
 
-        if (!Yii::$app->user->can('ownGroup', compact($group))) {
+        if (!Yii::$app->user->can('ownGroup', ['group' => $group])) {
             throw new yii\web\ForbiddenHttpException();
         }
 
@@ -113,7 +113,7 @@ class GroupController extends Controller
 
         if ($group->save()) {
             return [
-                'needRedirect' => !Yii::$app->user->can('ownGroup', compact($group)),
+                'needRedirect' => !Yii::$app->user->can('ownGroup', ['group' => $group]),
             ];
         }
 
@@ -153,7 +153,7 @@ class GroupController extends Controller
 
         $group = Group::findByCode($code);
 
-        if (!Yii::$app->user->can('ownGroup', compact($group))) {
+        if (!Yii::$app->user->can('ownGroup', ['group' => $group])) {
             throw new yii\web\ForbiddenHttpException();
         }
 

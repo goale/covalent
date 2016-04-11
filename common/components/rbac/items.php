@@ -22,14 +22,14 @@ return [
     ],
     'user' => [
         'type' => 1,
-        'ruleName' => 'projectRole',
+        'ruleName' => 'projectRule',
         'children' => [
             'createGroup',
         ],
     ],
     'viewer' => [
         'type' => 1,
-        'ruleName' => 'projectRole',
+        'ruleName' => 'projectRule',
         'children' => [
             'user',
             'viewGroup',
@@ -37,14 +37,14 @@ return [
     ],
     'tester' => [
         'type' => 1,
-        'ruleName' => 'projectRole',
+        'ruleName' => 'projectRule',
         'children' => [
             'viewer',
         ],
     ],
     'master' => [
         'type' => 1,
-        'ruleName' => 'projectRole',
+        'ruleName' => 'projectRule',
         'children' => [
             'tester',
             'editGroup',
@@ -52,7 +52,7 @@ return [
     ],
     'owner' => [
         'type' => 1,
-        'ruleName' => 'projectRole',
+        'ruleName' => 'projectRule',
         'children' => [
             'master',
             'ownGroup',
@@ -60,7 +60,7 @@ return [
     ],
     'admin' => [
         'type' => 1,
-        'ruleName' => 'projectRole',
+        'ruleName' => 'projectRule',
         'children' => [
             'owner',
             'doAll',
