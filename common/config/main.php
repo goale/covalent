@@ -20,6 +20,9 @@ return [
                     ] : [],
                     'globals' => ['html' => '\yii\helpers\Html'],
                     'uses' => ['yii\bootstrap'],
+                    'functions' => [
+                        't' => 'Yii::t',
+                    ],
                 ],
             ],
 	    ],

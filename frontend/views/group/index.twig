@@ -1,18 +1,18 @@
-{{ set(this, 'title', 'Groups') }}
+{{ set(this, 'title', t('app', 'Groups')) }}
 {{ set(this, 'params', { 'breadcrumbs' : [
-    { 'label' : 'Groups', 'url' : '/groups' },
+    { 'label' : this.title, 'url' : '/groups' },
     ] }) }}
 <div class="groups-list">
     <div class="row">
         <div class="col-md-9">
-            <h2>Groups</h2>
+            <h2>{{ t('app', 'Groups') }}</h2>
         </div>
         <div class="col-md-3 groups-list__btn-new">
-            <a class="btn btn-success" href="/groups/new">New group</a>
+            <a class="btn btn-success" href="/groups/new">{{ t('app', 'New group') }}</a>
         </div>
     </div>
     {% if groups is empty %}
-        <p>No groups</p>
+        <p>{{ t('app', 'No groups') }}</p>
     {% else %}
     {% for group in groups %}
         <div class="groups-list__item">
@@ -24,7 +24,10 @@
             </div>
             {% endif %}
             <a href="/groups/{{ group.code }}">{{ group.name }}</a><br>
-            <span class="group-item__info">{{ group.users }} users, {{ group.projects }} projects</span>
+            <span class="group-item__info">
+                {{ t('app', '{users} users', { 'users' : group.users }) }},
+                {{ t('app', '{projects} projects', { 'projects' : group.projects }) }}
+            </span>
         </div>
     {% endfor %}
     {% endif %}

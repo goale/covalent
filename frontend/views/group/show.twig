@@ -1,6 +1,6 @@
 {{ set(this, 'title', group.name) }}
 {{ set(this, 'params', { 'breadcrumbs' : [
-    { 'label' : 'Groups', 'url' : '/groups' },
+    { 'label' : t('app', 'Groups'), 'url' : '/groups' },
     { 'label' : this.title }
     ] }) }}
 <div class="group-detail">
@@ -13,7 +13,7 @@
         <a
             href="/projects/new?group={{ group.id }}"
             class="btn btn-success group-description__projects-btn">
-                Add project
+                {{ t('app', 'Add project') }}
         </a>
     </div>
     <ul class="nav nav-tabs">
@@ -30,7 +30,7 @@
         <div class="group-detail__users-item">
             <div class="group-detail__users-item-first">
                 <a href="#" target="_blank">{{  owner.username }}</a>
-                <span class="label label-success">Owner</span>
+                <span class="label label-success">{{ t('app', 'Owner') }}</span>
             </div>
 
         </div>
@@ -40,7 +40,7 @@
         <div class="group-detail__users-add">
             <form name="group-user-add" class="form-inline" data-group="{{ group.id }}">
                 <select name="group_user" class="form-control group-detail__users-add-user">
-                    <option value="">Choose user</option>
+                    <option value="">{{ t('app', 'Choose user') }}</option>
                     {% for user in users %}
                         <option value="{{ user.id }}">{{ user.username }}</option>
                     {% endfor %}
@@ -50,7 +50,9 @@
                         <option value="{{ id }}">{{ role }}</option>
                     {% endfor %}
                 </select>
-                <button class="btn btn-primary group-detail__users-add-btn" disabled>Add user</button>
+                <button class="btn btn-primary group-detail__users-add-btn" disabled>
+                    {{ t('app', 'Add user') }}
+                </button>
                 <span class="group-detail__users-add-error text-danger"></span>
             </form>
         </div>

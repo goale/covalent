@@ -1,6 +1,6 @@
-{{ set(this, 'title', 'Add group') }}
+{{ set(this, 'title', t('app', 'Add group')) }}
 {{ set(this, 'params', { 'breadcrumbs' : [
-    { 'label' : 'Groups', 'url' : '/groups' },
+    { 'label' : t('app', 'Groups'), 'url' : '/groups' },
     { 'label' : this.title }
 ] }) }}
 <div class="group-form">
@@ -29,6 +29,6 @@
             </div>
         </div>
     </div>
-    {{ html.submitButton('Add group', { 'class' : 'btn btn-primary' }) | raw }}
+    {{ html.submitButton(t('app', 'Add group'), { 'class' : 'btn btn-primary' }) | raw }}
     {{ active_form_end() }}
 </div>
