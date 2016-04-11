@@ -60,6 +60,16 @@ class Group extends ActiveRecord
     }
 
     /**
+     * Deletes all user assigned to a deleted group
+     */
+    public function afterDelete()
+    {
+        GroupUser::deleteAll(['group_id' => $this->id]);
+
+        parent::afterDelete();
+    }
+
+    /**
      * @return \yii\db\ActiveQuery
      */
     public function getProjects()
