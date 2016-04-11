@@ -7,6 +7,7 @@ use common\models\GroupUser;
 use common\models\User;
 use yii;
 use yii\filters\AccessControl;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -149,7 +150,6 @@ class GroupController extends Controller
      */
     public function actionShow($code)
     {
-        // TODO: needs refactoring
         $group = Group::findByCode($code);
 
         if (!empty($group->description)) {
@@ -157,38 +157,63 @@ class GroupController extends Controller
             $group->description = $parseDown->parse($group->description);
         }
 
+        $canEdit = Yii::$app->user->can('editGroup', ['group' => $group]);
+
         if ($group && Yii::$app->user->can('viewGroup', ['group' => $group])) {
-            $roles = [];
             $users = [];
             $groupUsers = [];
 
+            if ($canEdit) {
+                $users = ArrayHelper::index(User::getAll(), 'id');
+
+                if (isset($users[$group->user_id])) {
+                    $owner = $users[$group->user_id];
+                    unset($users[$group->user_id]);
+                }
+
+                $groupUsers = $this->populateGroupWithUsers($group);
+            }
+
+            return $this->render('show.twig', array_merge(compact(
+                'group',
+                'users',
+                'groupUsers',
+                'owner'),
+                [
+                    'roles' => $this->roles,
+                    'canEdit' => $canEdit
+                ]
+            ));
+        }
+
+        throw new NotFoundHttpException('Group not found');
+    }
+
+    /**
+     * Builds members info for selected group (username and role)
+     * @param Group $group
+     * @return array
+     */
+    protected function populateGroupWithUsers(Group $group)
+    {
+        $roles = [];
+        $users = [];
+
+        if (!empty($group->groupUsers)) {
             foreach ($group->groupUsers as $role) {
                 $roles[$role->user_id] = $role->role_id;
             }
 
             foreach ($group->users as $user) {
-                $groupUsers[] = [
+                $users[] = [
                     'id' => $user->id,
                     'name' => $user->username,
                     'role' => $roles[$user->id],
                 ];
             }
-
-            if (Yii::$app->user->can('editGroup', ['groupId' => $group->id])) {
-                $users = User::findWithoutOwner($group->id);
-            }
-
-            return $this->render('show.twig', [
-                'group' => $group,
-                'users' => $users,
-                'groupUsers' => $groupUsers,
-                'owner' => User::findOne($group->user_id),
-                'roles' => $this->roles,
-                'canEdit' => Yii::$app->user->can('editGroup', ['group' => $group]),
-            ]);
         }
 
-        throw new NotFoundHttpException('Group not found');
+        return $users;
     }
 
     /**

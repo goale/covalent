@@ -109,20 +109,15 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Finds all active users except group owner
+     * Finds all active users for dropdowns
      *
-     * @param $groupId
      * @return array|yii\db\ActiveRecord[]
      */
-    public static function findWithoutOwner($groupId)
+    public static function getAll()
     {
-        $group = Group::findOne($groupId);
-
         return User::find()
             ->select(['id', 'username'])
             ->where(['status' => User::STATUS_ACTIVE])
-            ->andWhere(['<', 'role', self::ROLE_ADMIN])
-            ->andWhere(['!=', 'id', $group->user_id])
             ->asArray()
             ->all();
     }
