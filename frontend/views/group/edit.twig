@@ -23,8 +23,8 @@
                 <figure class="highlight group-form__preview"></figure>
             </div>
         </div>
-        {{ html.submitButton('Save', { 'class' : 'btn btn-primary' }) | raw }}
     </div>
+    {{ html.submitButton('Save', { 'class' : 'btn btn-primary' }) | raw }}
     {{ active_form_end() }}
 </div>
 {% if isOwner %}
@@ -34,6 +34,7 @@
         </div>
         <div class="panel-body">
             <div class="group-form__owner">
+                <p class="text-danger">All current owner rights will be discarded</p>
                 <select name="group-owner-change" class="form-control group-form__owner-change">
                     {% for user in users %}
                     <option value="{{ user.id }}" {{ user.id == group.user_id ? 'selected' }}>
@@ -41,12 +42,13 @@
                     </option>
                     {% endfor %}
                 </select>
-                <button class="btn btn-primary group-form__owner-change-btn" disabled>Change</button>
+                <button class="btn btn-primary group-form__owner-change-btn" disabled>Change owner</button>
             </div>
             {% if group.projects_count == 0 %}
-            <div class="group-form__delete">
-                <button class="btn btn-danger group-form__delete-btn">Delete group</button>
-            </div>
+                <div class="group-form__delete">
+                    <p class="text-danger">Removed group can not be restored</p>
+                    <button class="btn btn-danger group-form__delete-btn">Delete group</button>
+                </div>
             {% endif %}
         </div>
     </div>

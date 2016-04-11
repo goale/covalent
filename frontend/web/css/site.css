@@ -115,6 +115,16 @@
     margin-left: 10px;
 }
 
+.group-form__owner-change {
+    width: 150px;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.group-form__delete {
+    margin-top: 20px;
+}
+
 /* Groups detail */
 .group-detail__description {
     padding-left: 25px;
