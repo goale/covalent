@@ -16,9 +16,9 @@ return [
         'type' => 2,
         'description' => 'Create group',
     ],
-    'isAdmin' => [
+    'doAll' => [
         'type' => 2,
-        'description' => 'Is Admin',
+        'description' => 'Do all what you want',
     ],
     'user' => [
         'type' => 1,
@@ -62,8 +62,8 @@ return [
         'type' => 1,
         'ruleName' => 'projectRole',
         'children' => [
-            'master',
-            'isAdmin',
+            'owner',
+            'doAll',
         ],
     ],
 ];

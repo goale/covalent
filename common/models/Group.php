@@ -115,7 +115,7 @@ class Group extends ActiveRecord
 
         $groups = self::find();
 
-        if (!Yii::$app->user->can('isAdmin')) {
+        if (!Yii::$app->user->can('doAll')) {
             $groups
                 ->joinWith('groupUsers')
                 ->where(['groups.user_id' => Yii::$app->user->id])
@@ -123,10 +123,10 @@ class Group extends ActiveRecord
         }
 
         foreach ($groups->each() as $group) {
-            if (!Yii::$app->user->can('isAdmin') && !empty($group->groupUsers)) {
+            if (!Yii::$app->user->can('ownGroup', compact($group)) && !empty($group->groupUsers)) {
                 $editable = $group->groupUsers[0]->role_id >= User::ROLE_MASTER;
             } else {
-                $editable = $group->isGroupOwner(Yii::$app->user->id) || Yii::$app->user->can('isAdmin');
+                $editable = Yii::$app->user->can('ownGroup', compact($group));
             }
 
             $result[] = [

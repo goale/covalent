@@ -40,9 +40,9 @@ class RbacController extends Controller
         $auth->add($createGroup);
 
         // Administrator permissions
-        $isAdmin = $auth->createPermission('isAdmin');
-        $isAdmin->description = 'Is Admin';
-        $auth->add($isAdmin);
+        $doAll = $auth->createPermission('doAll');
+        $doAll->description = 'Do all what you want';
+        $auth->add($doAll);
 
 
         // TODO: project permissions
@@ -84,7 +84,7 @@ class RbacController extends Controller
         $admin = $auth->createRole('admin');
         $admin->ruleName = $rule->name;
         $auth->add($admin);
-        $auth->addChild($admin, $master);
-        $auth->addChild($admin, $isAdmin);
+        $auth->addChild($admin, $owner);
+        $auth->addChild($admin, $doAll);
     }
 }

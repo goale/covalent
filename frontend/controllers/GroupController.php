@@ -78,29 +78,14 @@ class GroupController extends Controller
 
         if (Yii::$app->user->can('editGroup', compact('group'))) {
             if (Yii::$app->request->isPatch) {
-                if (Yii::$app->request->isAjax && Yii::$app->request->post('type') == 'owner') {
-                    Yii::$app->response->format = yii\web\Response::FORMAT_JSON;
-                    if (!$group->isGroupOwner(Yii::$app->user->id)) {
-                        throw new yii\web\ForbiddenHttpException();
-                    }
-
-                    $group->user_id = Yii::$app->request->post('user');
-
-                    if ($group->save()) {
-                        return [
-                            'needRedirect' => !$group->isGroupOwner(Yii::$app->user->id),
-                        ];
-                    }
-
-                    throw new yii\web\ServerErrorHttpException();
+                if (Yii::$app->request->post('type') == 'owner') {
+                    return $this->changeGroupOwner($group);
                 } else {
-                    $group->load(Yii::$app->request->post());
-                    $group->save();
-                    return $this->redirect(Url::to(['group/show', 'code' => $group->code]));
+                    return $this->changeGroupDescription($group);
                 }
             }
 
-            $isOwner = $group->isGroupOwner(Yii::$app->user->id) || Yii::$app->user->can('isAdmin');
+            $isOwner = Yii::$app->user->can('ownGroup', compact($group));
 
             $users = User::findAll(['status' => User::STATUS_ACTIVE]);
 
@@ -108,6 +93,42 @@ class GroupController extends Controller
         }
 
         throw new yii\web\ForbiddenHttpException('Permission denied');
+    }
+
+    /**
+     * @param Group $group
+     * @return array
+     * @throws yii\web\ForbiddenHttpException
+     * @throws yii\web\ServerErrorHttpException
+     */
+    protected function changeGroupOwner(Group $group)
+    {
+        Yii::$app->response->format = yii\web\Response::FORMAT_JSON;
+
+        if (!Yii::$app->user->can('ownGroup', compact($group))) {
+            throw new yii\web\ForbiddenHttpException();
+        }
+
+        $group->user_id = Yii::$app->request->post('user');
+
+        if ($group->save()) {
+            return [
+                'needRedirect' => !Yii::$app->user->can('ownGroup', compact($group)),
+            ];
+        }
+
+        throw new yii\web\ServerErrorHttpException();
+    }
+
+    /**
+     * @param Group $group
+     * @return yii\web\Response
+     */
+    protected function changeGroupDescription(Group $group)
+    {
+        $group->load(Yii::$app->request->post());
+        $group->save();
+        return $this->redirect(Url::to(['group/show', 'code' => $group->code]));
     }
 
     /**
@@ -132,7 +153,7 @@ class GroupController extends Controller
 
         $group = Group::findByCode($code);
 
-        if (!$group->isGroupOwner(Yii::$app->user->id) || !Yii::$app->user->can('isAdmin')) {
+        if (!Yii::$app->user->can('ownGroup', compact($group))) {
             throw new yii\web\ForbiddenHttpException();
         }
 
@@ -348,5 +369,4 @@ class GroupController extends Controller
 
         return $groupUser->save();
     }
-
 }
