@@ -1,0 +1,55 @@
+{{ use('yii/widgets/Breadcrumbs') }}
+
+{{ register_asset_bundle('frontend/assets/AppAsset') }}
+{{ void(this.beginPage()) }}
+<!DOCTYPE html>
+<html lang="{{ app.language }}">
+    <head>
+        <meta charset="{{ app.charset }}">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{{ html.encode(this.title) }}</title>
+        {{ html.csrfMetaTags | raw }}
+        {{ void(this.head) }}
+    </head>
+    <body>
+        {{ void(this.beginBody()) }}
+        <nav class="navbar navbar-default">
+            <div class="container">
+                <div class="row">
+                <div class="col-lg-2">
+                    <a href="/" class="navbar-brand">Covalent</a>
+                </div>
+                <div class="col-lg-6 col-lg-offset-1">
+                    {{ breadcrumbs_widget({
+                        'links' : (this.params['breadcrumbs'] is defined) ? this.params['breadcrumbs'] : [],
+                        'homeLink' : { 'label' : 'Dashboard', 'url' : '/' }
+                    }) }}
+                </div>
+                <div class="col-lg-3">
+                    {% if app.user.isGuest %}
+                        <ul class="nav navbar-nav navbar-right">
+                            <li><a href="/site/login">Login</a></li>
+                            <li><a href="/site/signup">Signup</a></li>
+                        </ul>
+                    {% else %}
+                        <p class="navbar-text navbar-right">Signed as Otto</p>
+                    {% endif %}
+                </div>
+                </div>
+            </div>
+        </nav>
+        <div class="container">
+            <div class="row">
+            <div class="col-lg-2">
+                menu
+            </div>
+            <div class="col-lg-9 col-lg-offset-3">
+                {{ content | raw }}
+            </div>
+            </div>
+        </div>
+
+        {{ void(this.endBody()) }}
+    </body>
+</html>
+{{ void(this.endPage()) }}

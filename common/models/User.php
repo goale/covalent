@@ -1,7 +1,7 @@
 <?php
 namespace common\models;
 
-use Yii;
+use yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
@@ -15,6 +15,7 @@ use yii\web\IdentityInterface;
  * @property string $password_hash
  * @property string $password_reset_token
  * @property string $email
+ * @property integer $role
  * @property string $auth_key
  * @property integer $status
  * @property integer $created_at
@@ -26,12 +27,19 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
 
+    const ROLE_USER = 10;
+    const ROLE_VIEWER = 20;
+    const ROLE_TESTER = 30;
+    const ROLE_MASTER = 40;
+    const ROLE_OWNER = 50;
+    const ROLE_ADMIN = 60;
+
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return '{{%user}}';
+        return '{{%users}}';
     }
 
     /**
@@ -101,6 +109,20 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * Finds all active users for dropdowns
+     *
+     * @return array|yii\db\ActiveRecord[]
+     */
+    public static function getAll()
+    {
+        return User::find()
+            ->select(['id', 'username'])
+            ->where(['status' => User::STATUS_ACTIVE])
+            ->asArray()
+            ->all();
+    }
+
+    /**
      * Finds out if password reset token is valid
      *
      * @param string $token password reset token
@@ -123,6 +145,12 @@ class User extends ActiveRecord implements IdentityInterface
     public function getId()
     {
         return $this->getPrimaryKey();
+    }
+
+    public function getGroups()
+    {
+        return $this->hasMany(Group::className(), ['id' => 'group_id'])
+            ->viaTable('group_user', ['user_id' => 'id']);
     }
 
     /**
