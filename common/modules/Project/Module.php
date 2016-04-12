@@ -13,9 +13,9 @@ class Module extends \yii\base\Module implements BootstrapInterface
         'GET projects' => 'project/project/explore',
         'POST projects' => 'project/project/create',
         'projects/new' => 'project/project/new',
-        [
-            'class' => 'common\modules\Project\components\ProjectUrlRule'
-        ],
+//        [
+//            'class' => 'common\modules\Project\components\ProjectUrlRule'
+//        ],
 
     ];
 

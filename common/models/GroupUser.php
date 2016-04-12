@@ -35,6 +35,35 @@ class GroupUser extends ActiveRecord
     }
 
     /**
+     * Decrements users count in group after deleting user
+     */
+    public function afterDelete()
+    {
+        Group::findOne($this->group_id)->updateCounters(['users_count' => -1]);
+
+        parent::afterDelete();
+    }
+
+    /**
+     * Increments users count after adding new user
+     * @param bool $insert
+     * @param array $changedAttributes
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        if ($insert) {
+            Group::findOne($this->group_id)->updateCounters(['users_count' => 1]);
+        }
+
+        parent::afterSave($insert, $changedAttributes);
+    }
+
+    public function getUsers()
+    {
+        return $this->hasMany(User::className(), ['id' => 'user_id']);
+    }
+
+    /**
      * @inheritdoc
      */
     public function attributeLabels()

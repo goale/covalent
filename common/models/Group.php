@@ -14,9 +14,13 @@ use yii\helpers\BaseInflector;
  * @property string $name
  * @property string $code
  * @property string $description
+ * @property integer $user_id
+ * @property integer $projects_count
+ * @property integer $users_count
  *
  * @property Project[] $projects
  * @property User[] $users
+ * @property GroupUser[] $groupUsers
  */
 class Group extends ActiveRecord
 {
@@ -56,6 +60,16 @@ class Group extends ActiveRecord
     }
 
     /**
+     * Deletes all user assigned to a deleted group
+     */
+    public function afterDelete()
+    {
+        GroupUser::deleteAll(['group_id' => $this->id]);
+
+        parent::afterDelete();
+    }
+
+    /**
      * @return \yii\db\ActiveQuery
      */
     public function getProjects()
@@ -70,6 +84,14 @@ class Group extends ActiveRecord
     {
         return $this->hasMany(User::className(), ['id' => 'user_id'])
             ->viaTable('group_user', ['group_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getGroupUsers()
+    {
+        return $this->hasMany(GroupUser::className(), ['group_id' => 'id']);
     }
 
 
@@ -91,21 +113,28 @@ class Group extends ActiveRecord
     {
         $result = [];
 
-        if (Yii::$app->user->identity->role == User::ROLE_ADMIN) {
-            $query = self::find()->select(['id', 'name', 'code'])->with('projects')->with('users');
-            $groups = $query->all();
-        } else {
-            $groups = User::findOne(Yii::$app->user->id)->groups;
+        $groups = self::find();
+
+        if (!Yii::$app->user->can('doAll')) {
+            $groups
+                ->joinWith('groupUsers')
+                ->where(['groups.user_id' => Yii::$app->user->id])
+                ->orWhere(['group_user.user_id' => Yii::$app->user->id]);
         }
 
-        foreach ($groups as $group) {
-            $result[$group->id] = [
+        foreach ($groups->each() as $group) {
+            if (!Yii::$app->user->can('editGroup', ['group' => $group]) && !empty($group->groupUsers)) {
+                $editable = $group->groupUsers[0]->role_id >= User::ROLE_MASTER;
+            } else {
+                $editable = Yii::$app->user->can('editGroup', ['group' => $group]);
+            }
+
+            $result[] = [
                 'name' => $group->name,
                 'code' => $group->code,
-                'users' => count($group->users),
-//                'projects' => count($group->projects),
-//                'users' => 0,
-                'projects' => 2,
+                'projects' => $group->projects_count,
+                'users' => $group->users_count,
+                'editable' => $editable,
             ];
         }
 
@@ -119,18 +148,23 @@ class Group extends ActiveRecord
     public function addGroup()
     {
         $this->code = BaseInflector::slug(BaseInflector::transliterate($this->name), '-');
+        $this->users_count++;
+        $this->user_id = Yii::$app->user->id;
 
         if (!$this->validate()) {
             return false;
         }
 
-        $saved = $this->save();
+        return $this->save();
+    }
 
-        if (!Yii::$app->user->isGuest) {
-            $user = User::findOne(Yii::$app->user->id);
-            $this->link('users', $user);
-        }
-
-        return $saved;
+    /**
+     * Checks if user had created a group
+     * @param $userId
+     * @return bool
+     */
+    public function isGroupOwner($userId)
+    {
+        return $this->user_id == $userId;
     }
 }

@@ -3,8 +3,9 @@
 namespace common\components\rbac;
 
 
+use common\models\Group;
+use common\models\GroupUser;
 use common\models\User;
-use common\modules\Project\models\GroupUser;
 use common\modules\Project\models\Project;
 use yii;
 use yii\rbac\Item;
@@ -13,7 +14,7 @@ use yii\rbac\Rule;
 class ProjectRule extends Rule
 {
 
-    public $name = 'projectRole';
+    public $name = 'projectRule';
 
     /**
      * Executes the rule.
@@ -30,8 +31,8 @@ class ProjectRule extends Rule
             $role = Yii::$app->user->identity->role;
         } else if (isset($params['project'])) {
             $role = $this->getUserRole($params['project']);
-        } else if (isset($params['groupId'])) {
-            $role = $this->getUserGroupRole($params['groupId']);
+        } else if (isset($params['group'])) {
+            $role = $this->getUserGroupRole($params['group']);
         } else {
             $role = Yii::$app->user->identity->role;
         }
@@ -39,6 +40,8 @@ class ProjectRule extends Rule
         switch ($item->name) {
             case 'admin':
                 return $role >= User::ROLE_ADMIN;
+            case 'owner':
+                return $role >= User::ROLE_OWNER;
             case 'master':
                 return $role >= User::ROLE_MASTER;
             case 'tester':
@@ -65,12 +68,18 @@ class ProjectRule extends Rule
 
     /**
      * Gets user role in group
-     * @param int $groupId
+     * @param Group $group
      * @return int
      */
-    protected function getUserGroupRole($groupId)
+    protected function getUserGroupRole($group)
     {
-        if ($groupRole = GroupUser::findOne(['user_id' => Yii::$app->user->id, 'group_id' => $groupId])) {
+        $userId = Yii::$app->user->id;
+
+        if ($group->isGroupOwner($userId)) {
+            return User::ROLE_OWNER;
+        }
+
+        if ($groupRole = GroupUser::findOne(['user_id' => $userId, 'group_id' => $group->id])) {
             return $groupRole->role_id;
         }
 
