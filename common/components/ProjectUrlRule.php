@@ -23,7 +23,7 @@ class ProjectUrlRule implements UrlRuleInterface
         $pathInfo = $request->getPathInfo();
         $params = [];
 
-        if (preg_match('%^(\w+)(/(\w+))?$%', $pathInfo)) {
+        if (preg_match('%^(\w+)/(\w+)(-\w+)+?$%', $pathInfo)) {
             if ($project = Project::findBySlug('/' . $pathInfo)) {
                 $params['project'] = $project['code'];
             }

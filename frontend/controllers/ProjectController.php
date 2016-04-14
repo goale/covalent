@@ -51,19 +51,15 @@ class ProjectController extends Controller
         $storeInGroup = false;
 
         if ($groupId = Yii::$app->request->get('group')) {
-            // TODO: check rights
-            if ($group = Group::findOne($groupId)) {
+            $group = Group::findOne($groupId);
+            if (Yii::$app->user->can('editGroup', compact('group'))) {
                 $model->group_id = $group['id'];
                 $namespace = $group->code;
                 $storeInGroup = true;
             }
         }
 
-        return $this->render('new.twig', [
-            'model' => $model,
-            'namespace' => $namespace,
-            'storeInGroup' => $storeInGroup,
-        ]);
+        return $this->render('new.twig', compact('model', 'namespace', 'storeInGroup'));
     }
     
     public function actionCreate()

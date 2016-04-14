@@ -10,7 +10,7 @@
     }) %}
     <div class="form-group">
         {{ form.field(model, 'name', {
-            'template' : "{label}\n<div class=\"input-group\"><div class=\"input-group-addon\">$namespace/</div>\n{input}</div>{error}"
+            'template' : "{label}\n<div class=\"input-group\"><div class=\"input-group-addon\">#{namespace}/</div>\n{input}</div>{error}"
         }).textInput({ 'autofocus' : true }) | raw }}
     </div>
     {% if storeInGroup %}

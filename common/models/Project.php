@@ -176,8 +176,8 @@ class Project extends ActiveRecord
         $this->user_id = Yii::$app->user->id;
 
         if ($this->group_id > 0) {
-            if ($group = Group::findOne($this->group_id)) {
-                // TODO: check rights
+            $group = Group::findOne($this->group_id);
+            if (Yii::$app->user->can('editGroup', compact('group'))) {
                 $this->slug = '/' . $group['code'] . '/' . $this->code;
                 $this->public = 0;
             } else {
