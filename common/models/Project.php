@@ -195,4 +195,13 @@ class Project extends ActiveRecord
 
         return $this->save();
     }
+
+    /**
+     * @param $userId
+     * @return int|string
+     */
+    public function isProjectOwner($userId)
+    {
+        return $this->user_id = Yii::$app->user->id;
+    }
 }

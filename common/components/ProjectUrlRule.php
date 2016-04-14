@@ -2,9 +2,7 @@
 
 namespace common\components;
 
-use common\models\Group;
 use common\models\Project;
-use common\models\User;
 use yii\web\Request;
 use yii\web\UrlManager;
 use yii\web\UrlRuleInterface;
@@ -21,15 +19,10 @@ class ProjectUrlRule implements UrlRuleInterface
     public function parseRequest($manager, $request)
     {
         $pathInfo = $request->getPathInfo();
-        $params = [];
 
         if (preg_match('%^(\w+)/(\w+)(-\w+)+?$%', $pathInfo)) {
             if ($project = Project::findBySlug('/' . $pathInfo)) {
-                $params['project'] = $project['code'];
-            }
-
-            if (isset($params['project'])) {
-                return ['project/show', $params];
+                return ['project/show', ['code' => $project['code']]];
             }
         }
 

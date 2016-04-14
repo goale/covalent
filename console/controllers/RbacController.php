@@ -19,46 +19,28 @@ class RbacController extends Controller
         $rule = new ProjectRule();
         $auth->add($rule);
 
-        // View group permission
-        $viewGroup = $auth->createPermission('viewGroup');
-        $viewGroup->description = 'View group';
-        $auth->add($viewGroup);
-
-        // Edit group permission
-        $editGroup = $auth->createPermission('editGroup');
-        $editGroup->description = 'Edit group';
-        $auth->add($editGroup);
-
-        // Own group
-        $ownGroup = $auth->createPermission('ownGroup');
-        $ownGroup->description = 'Own group';
-        $auth->add($ownGroup);
-
-        // Create group permission
-        $createGroup = $auth->createPermission('createGroup');
-        $createGroup->description = 'Create group';
-        $auth->add($createGroup);
+        $groupPermissions = $this->createGroupPermissions($auth);
 
         // Administrator permissions
         $doAll = $auth->createPermission('doAll');
         $doAll->description = 'Do all what you want';
         $auth->add($doAll);
 
-
         // TODO: project permissions
+        $projectPermissions = $this->createProjectPermissions($auth);
 
         // Create user role
         $user = $auth->createRole('user');
         $user->ruleName = $rule->name;
         $auth->add($user);
-        $auth->addChild($user, $createGroup);
 
         // Create viewer role
         $viewer = $auth->createRole('viewer');
         $viewer->ruleName = $rule->name;
         $auth->add($viewer);
         $auth->addChild($viewer, $user);
-        $auth->addChild($viewer, $viewGroup);
+        $auth->addChild($viewer, $groupPermissions['view']);
+        $auth->addChild($viewer, $projectPermissions['view']);
 
         // Create tester role
         $tester = $auth->createRole('tester');
@@ -71,14 +53,16 @@ class RbacController extends Controller
         $master->ruleName = $rule->name;
         $auth->add($master);
         $auth->addChild($master, $tester);
-        $auth->addChild($master, $editGroup);
+        $auth->addChild($master, $groupPermissions['edit']);
+        $auth->addChild($master, $projectPermissions['edit']);
 
         // Create owner role
         $owner = $auth->createRole('owner');
         $owner->ruleName = $rule->name;
         $auth->add($owner);
         $auth->addChild($owner, $master);
-        $auth->addChild($owner, $ownGroup);
+        $auth->addChild($owner, $groupPermissions['own']);
+        $auth->addChild($owner, $projectPermissions['own']);
 
         // Create admin role
         $admin = $auth->createRole('admin');
@@ -86,5 +70,47 @@ class RbacController extends Controller
         $auth->add($admin);
         $auth->addChild($admin, $owner);
         $auth->addChild($admin, $doAll);
+    }
+
+    /**
+     * @param yii\rbac\ManagerInterface $auth
+     * @return array
+     */
+    private function createGroupPermissions(yii\rbac\ManagerInterface $auth)
+    {
+        $view = $auth->createPermission('viewGroup');
+        $view->description = 'View group';
+        $auth->add($view);
+
+        $edit = $auth->createPermission('editGroup');
+        $edit->description = 'Edit group';
+        $auth->add($edit);
+
+        $own = $auth->createPermission('ownGroup');
+        $own->description = 'Own group';
+        $auth->add($own);
+
+        return compact('view', 'edit', 'own');
+    }
+
+    /**
+     * @param yii\rbac\ManagerInterface $auth
+     * @return array
+     */
+    private function createProjectPermissions(yii\rbac\ManagerInterface $auth)
+    {
+        $view = $auth->createPermission('viewProject');
+        $view->description = 'View project';
+        $auth->add($view);
+
+        $edit = $auth->createPermission('editProject');
+        $edit->description = 'Edit project';
+        $auth->add($edit);
+
+        $own = $auth->createPermission('ownProject');
+        $own->description = 'Own project';
+        $auth->add($own);
+
+        return compact('view', 'edit', 'own');
     }
 }
