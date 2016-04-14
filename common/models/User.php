@@ -33,6 +33,12 @@ class User extends ActiveRecord implements IdentityInterface
     const ROLE_MASTER = 40;
     const ROLE_OWNER = 50;
     const ROLE_ADMIN = 60;
+    
+    public static $roles = [
+        self::ROLE_MASTER => 'Master',
+        self::ROLE_TESTER => 'Tester',
+        self::ROLE_VIEWER => 'Viewer',
+    ];
 
     /**
      * @inheritdoc

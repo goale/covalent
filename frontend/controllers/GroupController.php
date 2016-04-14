@@ -16,12 +16,6 @@ class GroupController extends Controller
 {
     public $layout = 'main.twig';
 
-    public $roles = [
-        User::ROLE_MASTER => 'Master',
-        User::ROLE_TESTER => 'Tester',
-        User::ROLE_VIEWER => 'Viewer',
-    ];
-
     /**
      * @return array
      */
@@ -201,7 +195,7 @@ class GroupController extends Controller
                 'groupUsers',
                 'owner'),
                 [
-                    'roles' => $this->roles,
+                    'roles' => User::$roles,
                     'canEdit' => $canEdit
                 ]
             ));
@@ -268,7 +262,7 @@ class GroupController extends Controller
 
         $user = User::findOne($userId);
 
-        if (!isset($this->roles[$role]) || !$user) {
+        if (!isset(User::$roles[$role]) || !$user) {
             throw new yii\base\InvalidParamException('User or role does not exist');
         }
 
@@ -291,7 +285,7 @@ class GroupController extends Controller
                 'role' => $role,
             ],
             'group' => $group->id,
-            'roles' => $this->roles
+            'roles' => User::$roles
         ]);
     }
 
@@ -357,7 +351,7 @@ class GroupController extends Controller
 
         $groupUser = GroupUser::findOne(['group_id' => $group, 'user_id' => $userId]);
 
-        if (!$groupUser || !isset($this->roles[$role])) {
+        if (!$groupUser || !isset(User::$roles[$role])) {
             throw new yii\base\InvalidParamException('User or role does not exist');
         }
 

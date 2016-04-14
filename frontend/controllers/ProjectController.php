@@ -5,8 +5,10 @@ namespace frontend\controllers;
 
 use common\models\Group;
 use common\models\Project;
+use common\models\User;
 use yii;
 use yii\data\ActiveDataProvider;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 
 class ProjectController extends Controller
@@ -39,9 +41,26 @@ class ProjectController extends Controller
         ]);
     }
     
-    public function actionShow($project)
+    public function actionShow($code)
     {
-        return $this->render('project');
+        $project = Project::findByCode($code);
+
+        if (!empty($project->description)) {
+            $parseDown = new \Parsedown();
+            $project->description = $parseDown->parse($project->description);
+        }
+
+        $canEdit = Yii::$app->user->can('editProject', compact('project'));
+        $roles = User::$roles;
+
+        $users = ArrayHelper::index(User::getAll(), 'id');
+
+        if (isset($users[$project->user_id])) {
+            $owner = $users[$project->user_id];
+            unset($users[$project->user_id]);
+        }
+
+        return $this->render('show.twig', compact('project', 'canEdit', 'roles', 'users', 'owner'));
     }
 
     public function actionNew()
