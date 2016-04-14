@@ -5,6 +5,9 @@ return [
     'showScriptName' => false,
     //'enableStrictParsing' => true,
     'rules' => [
+        'GET projects/new' => 'project/new',
+        'GET projects' => 'project/explore',
+        'POST projects' => 'project/create',
         'POST groups/<group>/users' => 'group/add-user',
         'PATCH groups/<group>/users' => 'group/change-user-role',
         'DELETE groups/<group>/users' => 'group/delete-user',
@@ -15,5 +18,8 @@ return [
         'GET groups' => 'group/index',
         'POST groups' => 'group/create',
         'GET users' => 'user/index',
+        [
+            'class' => 'common\components\ProjectUrlRule',
+        ]
     ],
 ];

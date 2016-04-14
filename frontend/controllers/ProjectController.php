@@ -1,15 +1,20 @@
 <?php
 
-namespace common\commands\Project\controllers;
+namespace frontend\controllers;
 
 
-use common\modules\Project\models\Group;
-use common\modules\Project\models\Project;
+use common\models\Group;
+use common\models\Project;
 use yii;
+use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 
 class ProjectController extends Controller
 {
+    const PROJECTS_PER_PAGE = 20;
+
+    public $layout = 'main.twig';
+
     public function actionIndex()
     {
         $projects = Project::getAll();
@@ -21,7 +26,17 @@ class ProjectController extends Controller
     {
         $projects = Project::getPublic();
 
-        return $this->render('index', ['projects' => $projects]);
+        $projectsProvider = new ActiveDataProvider([
+            'query' => $projects,
+            'pagination' => [
+                'pageSize' => self::PROJECTS_PER_PAGE,
+            ],
+        ]);
+
+        return $this->render('index.twig', [
+            'projects' => $projectsProvider->models,
+            'pagination' => $projectsProvider->pagination,
+        ]);
     }
     
     public function actionShow($project)
@@ -44,7 +59,7 @@ class ProjectController extends Controller
             }
         }
 
-        return $this->render('new', [
+        return $this->render('new.twig', [
             'model' => $model,
             'namespace' => $namespace,
             'storeInGroup' => $storeInGroup,

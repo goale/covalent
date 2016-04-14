@@ -1,10 +1,10 @@
 <?php
 
-namespace common\modules\Project\components;
+namespace common\components;
 
 use common\models\Group;
+use common\models\Project;
 use common\models\User;
-use common\modules\Project\models\Project;
 use yii\web\Request;
 use yii\web\UrlManager;
 use yii\web\UrlRuleInterface;
@@ -23,24 +23,13 @@ class ProjectUrlRule implements UrlRuleInterface
         $pathInfo = $request->getPathInfo();
         $params = [];
 
-        if (preg_match('%^(\w+)(/(\w+))?$%', $pathInfo, $matches)) {
-            if (User::findByUsername($matches[1])) {
-                $params['user'] = $matches[1];
-            } elseif (Group::findByCode($matches[1])) {
-                $params['group'] = $matches[1];
-            }
-
-            if (!empty($params) && isset($matches[3])) {
-                if (Project::findByCode($matches[3])) {
-                    $params['project'] = $matches[3];
-                }
-                // TODO: check rights
-            } else {
-                return false;
+        if (preg_match('%^(\w+)(/(\w+))?$%', $pathInfo)) {
+            if ($project = Project::findBySlug('/' . $pathInfo)) {
+                $params['project'] = $project['code'];
             }
 
             if (isset($params['project'])) {
-                return ['project/project/show', $params];
+                return ['project/show', $params];
             }
         }
 

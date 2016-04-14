@@ -1,0 +1,35 @@
+{{ set(this, 'title', t('app', 'Add project')) }}
+{{ set(this, 'params', { 'breadcrumbs' : [
+    { 'label' : t('app', 'Projects'), 'url' : '/projects' },
+    { 'label' : this.title }
+    ] }) }}
+<div class="group-form">
+    {% set form = active_form_begin({
+    'id' : 'project-new-form',
+    'action' : '/projects'
+    }) %}
+    <div class="form-group">
+        {{ form.field(model, 'name', {
+            'template' : "{label}\n<div class=\"input-group\"><div class=\"input-group-addon\">$namespace/</div>\n{input}</div>{error}"
+        }).textInput({ 'autofocus' : true }) | raw }}
+    </div>
+    {% if storeInGroup %}
+        {{ form.field(model, 'group_id').hiddenInput().label(false) | raw }}
+    {% else %}
+        {{ form.field(model, 'public').checkbox() | raw }}
+    {% endif %}
+    {{ form.field(model, 'url') | raw }}
+    {{ form.field(model, 'source_url') | raw }}
+    {{ html.activeLabel(model, 'description') | raw }}
+    <div class="form-group">
+        <div class="zero-preview">
+            <span class="preview-btn group-form__preview-btn">
+                {{ t('app', 'Preview') }}
+            </span>
+        </div>
+        {{ html.activeTextarea(model, 'description', { class : 'form-control group-form__description' }) | raw }}
+        <figure class="highlight group-form__preview"></figure>
+    </div>
+    {{ html.submitButton(t('app', 'Add project'), { 'class' : 'btn btn-primary' }) | raw }}
+    {{ active_form_end() }}
+</div>

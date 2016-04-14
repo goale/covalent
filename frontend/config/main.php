@@ -11,12 +11,6 @@ return [
     'basePath' => dirname(__DIR__),
     'bootstrap' => [
         'log',
-        'project',
-    ],
-    'modules' => [
-        'project' => [
-            'class' => 'common\modules\Project\Module',
-        ],
     ],
     'controllerNamespace' => 'frontend\controllers',
     'components' => [

@@ -1,9 +1,8 @@
 <?php
 
-namespace common\modules\Project\models;
+namespace common\models;
 
-use common\models\User;
-use Yii;
+use yii;
 use yii\db\ActiveRecord;
 use yii\helpers\BaseInflector;
 
@@ -38,9 +37,49 @@ class Project extends ActiveRecord
         return '{{%projects}}';
     }
 
+    /**
+     * Increment group projects count if created project is in group
+     * @param bool $insert
+     * @param array $changedAttributes
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        if ($insert && $this->group_id > 0) {
+            Group::findOne($this->group_id)->updateCounters(['projects_count' => 1]);
+        }
+
+        parent::afterSave($insert, $changedAttributes);
+    }
+
+    /**
+     *  Decrement group projects count on deleting aof  related project
+     */
+    public function afterDelete()
+    {
+        if ($this->group_id > 0) {
+            Group::findOne($this->group_id)->updateCounters(['projects_count', -1]);
+        }
+
+        parent::afterDelete();
+    }
+
+    public function getMembers()
+    {
+        return $this->hasMany(User::className(), ['id' => 'user_id'])
+            ->viaTable('project_user', ['project_id' => 'id']);
+    }
+
     public static function getPublic()
     {
-        return static::findAll(['active' => true]);
+        $projects = static::find();
+
+        if (!Yii::$app->user->can('doAll')) {
+            $projects
+                ->where(['public' => true])
+                ->orWhere(['user_id' => Yii::$app->user->id]);
+        }
+
+        return $projects;
     }
 
     /**
