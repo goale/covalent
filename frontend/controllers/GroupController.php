@@ -5,6 +5,8 @@ namespace frontend\controllers;
 use common\models\Group;
 use common\models\GroupUser;
 use common\models\User;
+use common\traits\MemberTrait;
+use common\traits\StringyTrait;
 use yii;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
@@ -14,6 +16,8 @@ use yii\web\NotFoundHttpException;
 
 class GroupController extends Controller
 {
+    use MemberTrait, StringyTrait;
+    
     public $layout = 'main.twig';
 
     /**
@@ -67,7 +71,6 @@ class GroupController extends Controller
      */
     public function actionEdit($code)
     {
-        // TODO: needs huge refactoring
         $group = Group::findByCode($code);
 
         if (Yii::$app->user->can('editGroup', ['group' => $group])) {
@@ -167,16 +170,12 @@ class GroupController extends Controller
     {
         $group = Group::findByCode($code);
 
-        if (!empty($group->description)) {
-            $parseDown = new \Parsedown();
-            $group->description = $parseDown->parse($group->description);
-        }
+        $group->description = $this->markdownify($group->description);
 
         $canEdit = Yii::$app->user->can('editGroup', ['group' => $group]);
 
         if ($group && Yii::$app->user->can('viewGroup', ['group' => $group])) {
             $users = [];
-            $groupUsers = [];
 
             if ($canEdit) {
                 $users = ArrayHelper::index(User::getAll(), 'id');
@@ -186,7 +185,7 @@ class GroupController extends Controller
                     unset($users[$group->user_id]);
                 }
 
-                $groupUsers = $this->populateGroupWithUsers($group);
+                $groupUsers = $this->buildMembersWithRoles($users, $group->groupUsers);
             }
 
             return $this->render('show.twig', array_merge(compact(
@@ -202,33 +201,6 @@ class GroupController extends Controller
         }
 
         throw new NotFoundHttpException('Group not found');
-    }
-
-    /**
-     * Builds members info for selected group (username and role)
-     * @param Group $group
-     * @return array
-     */
-    protected function populateGroupWithUsers(Group $group)
-    {
-        $roles = [];
-        $users = [];
-
-        if (!empty($group->groupUsers)) {
-            foreach ($group->groupUsers as $role) {
-                $roles[$role->user_id] = $role->role_id;
-            }
-
-            foreach ($group->users as $user) {
-                $users[] = [
-                    'id' => $user->id,
-                    'name' => $user->username,
-                    'role' => $roles[$user->id],
-                ];
-            }
-        }
-
-        return $users;
     }
 
     /**

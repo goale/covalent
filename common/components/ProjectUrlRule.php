@@ -20,9 +20,9 @@ class ProjectUrlRule implements UrlRuleInterface
     {
         $pathInfo = $request->getPathInfo();
 
-        if (preg_match('%^(\w+)/(\w+)(-\w+)+?$%', $pathInfo)) {
+        if (preg_match('%^([\w\d-]+)/([\w\d-]+)$%', $pathInfo)) {
             if ($project = Project::findBySlug('/' . $pathInfo)) {
-                return ['project/show', ['code' => $project['code']]];
+                return ['project/show', ['project' => $project]];
             }
         }
 

@@ -6,6 +6,8 @@ namespace frontend\controllers;
 use common\models\Group;
 use common\models\Project;
 use common\models\User;
+use common\traits\MemberTrait;
+use common\traits\StringyTrait;
 use yii;
 use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
@@ -13,6 +15,8 @@ use yii\web\Controller;
 
 class ProjectController extends Controller
 {
+    use MemberTrait, StringyTrait;
+
     const PROJECTS_PER_PAGE = 20;
 
     public $layout = 'main.twig';
@@ -40,27 +44,37 @@ class ProjectController extends Controller
             'pagination' => $projectsProvider->pagination,
         ]);
     }
-    
-    public function actionShow($code)
-    {
-        $project = Project::findByCode($code);
 
-        if (!empty($project->description)) {
-            $parseDown = new \Parsedown();
-            $project->description = $parseDown->parse($project->description);
-        }
+    /**
+     * @param Project $project
+     * @return string
+     */
+    public function actionShow(Project $project)
+    {
+        $project->description = $this->markdownify($project->description);
 
         $canEdit = Yii::$app->user->can('editProject', compact('project'));
         $roles = User::$roles;
 
-        $users = ArrayHelper::index(User::getAll(), 'id');
+        if ($canEdit) {
+            $users = ArrayHelper::index(User::getAll(), 'id');
 
-        if (isset($users[$project->user_id])) {
-            $owner = $users[$project->user_id];
-            unset($users[$project->user_id]);
+            $groupUsers = $this->buildMembersWithRoles($users, $project->projectUsers);
+
+            if (isset($users[$project->user_id])) {
+                $owner = $users[$project->user_id];
+                unset($users[$project->user_id]);
+            }
         }
 
-        return $this->render('show.twig', compact('project', 'canEdit', 'roles', 'users', 'owner'));
+        return $this->render('show.twig', compact(
+            'project',
+            'canEdit',
+            'roles',
+            'users',
+            'owner',
+            'groupUsers'
+        ));
     }
 
     public function actionNew()
@@ -92,7 +106,7 @@ class ProjectController extends Controller
             }
         }
 
-        return $this->render('new', [
+        return $this->render('new.twig', [
             'model' => $model,
         ]);
     }

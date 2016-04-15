@@ -23,7 +23,7 @@ class m160316_085111_create_group extends Migration
             'id' => $this->primaryKey(),
             'group_id' => $this->integer()->notNull(),
             'user_id' => $this->integer()->notNull(),
-            'role_id' => $this->integer()->notNull()->defaultValue(User::ROLE_MASTER),
+            'role' => $this->integer()->notNull()->defaultValue(User::ROLE_MASTER),
         ]);
     }
 

@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\traits\StringyTrait;
 use yii;
 use yii\db\ActiveRecord;
 use yii\helpers\BaseInflector;
@@ -22,11 +23,14 @@ use yii\helpers\BaseInflector;
  * @property string $source_url
  * @property integer $user_id
  * @property integer $group_id
+ * @property ProjectUser[] $projectUsers
  *
  * @property User $user
  */
 class Project extends ActiveRecord
 {
+    use StringyTrait;
+
     const STATUS_ACTIVE = 1;
 
     /**
@@ -63,10 +67,21 @@ class Project extends ActiveRecord
         parent::afterDelete();
     }
 
+    /**
+     * @return $this
+     */
     public function getMembers()
     {
         return $this->hasMany(User::className(), ['id' => 'user_id'])
             ->viaTable('project_user', ['project_id' => 'id']);
+    }
+
+    /**
+     * @return yii\db\ActiveQuery
+     */
+    public function getProjectUsers()
+    {
+        return $this->hasMany(ProjectUser::className(), ['project_id' => 'id']);
     }
 
     public static function getPublic()
@@ -172,7 +187,7 @@ class Project extends ActiveRecord
 
     public function add()
     {
-        $this->code = BaseInflector::slug(BaseInflector::transliterate($this->name), '-');
+        $this->code = $this->slugify($this->name);
         $this->user_id = Yii::$app->user->id;
 
         if ($this->group_id > 0) {

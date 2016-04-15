@@ -2,9 +2,9 @@
 
 namespace common\models;
 
+use common\traits\StringyTrait;
 use yii;
 use yii\db\ActiveRecord;
-use yii\helpers\BaseInflector;
 
 /**
  * This is the model class for table "groups".
@@ -23,6 +23,8 @@ use yii\helpers\BaseInflector;
  */
 class Group extends ActiveRecord
 {
+    use StringyTrait;
+
     /**
      * @inheritdoc
      */
@@ -146,7 +148,7 @@ class Group extends ActiveRecord
      */
     public function addGroup()
     {
-        $this->code = BaseInflector::slug(BaseInflector::transliterate($this->name), '-');
+        $this->code = $this->slugify($this->name);
         $this->users_count++;
         $this->user_id = Yii::$app->user->id;
 
