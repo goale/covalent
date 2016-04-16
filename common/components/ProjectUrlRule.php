@@ -19,13 +19,50 @@ class ProjectUrlRule implements UrlRuleInterface
     public function parseRequest($manager, $request)
     {
         $pathInfo = $request->getPathInfo();
+        $verb = $request->getMethod();
 
-        if (preg_match('%^([\w\d-]+)/([\w\d-]+)$%', $pathInfo)) {
-            if ($project = Project::findBySlug('/' . $pathInfo)) {
-                return ['project/show', ['project' => $project]];
+        if (preg_match('%^([\w\d-]+/[\w\d-]+)(/(\w+))?$%', $pathInfo, $matches)) {
+            $project = Project::findBySlug('/' . $matches[1]);
+
+            if (!$project) {
+                return false;
+            }
+
+            \Yii::trace($project);
+
+            if (isset($matches[3])) {
+                return $this->mapProjectRoute($matches[3], $verb, $project);
+            }
+
+            return ['project/show', compact('project')];
+        }
+
+        return false;
+    }
+
+    /**
+     * Create route to controller mapping based on regexp matching
+     * @param $route
+     * @param $verb
+     * @param Project $project
+     * @return array|bool
+     */
+    private function mapProjectRoute($route, $verb, $project)
+    {
+        if ($route == 'users') {
+            switch ($verb) {
+                case 'POST':
+                    return ['project/add-member', compact('project')];
+                case 'PATCH':
+                    return ['project/change-member-role', compact('project')];
+                case 'DELETE':
+                    return ['project/delete-member', compact('project')];
+                default:
+                    return false;
             }
         }
 
+        // TODO: add /edit mappings
         return false;
     }
 
@@ -42,12 +79,12 @@ class ProjectUrlRule implements UrlRuleInterface
             if (isset($params['user'])) {
                 return $params['user'] . '/' . $params['project'];
             }
-            
+
             if (isset($params['group'])) {
                 return $params['group'] . '/' . $params['project'];
             }
         }
-        
+
         return false;
     }
 }

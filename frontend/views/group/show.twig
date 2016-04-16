@@ -35,17 +35,17 @@
 
         </div>
         {% for user in groupUsers %}
-            {{ include('user.twig', { 'user' : user }) }}
+            {{ include('@views/partials/user.twig', { 'user' : user }) }}
         {% endfor %}
         <div class="group-detail__users-add" data-url="/groups/{{ group.code }}/users">
             <form name="group-user-add" class="form-inline">
-                <select name="group_user" class="form-control group-detail__users-add-user">
+                <select name="user" class="form-control group-detail__users-add-user">
                     <option value="">{{ t('app', 'Choose user') }}</option>
                     {% for user in users %}
                         <option value="{{ user.id }}">{{ user.username }}</option>
                     {% endfor %}
                 </select>
-                <select name="group_user_role" class="form-control">
+                <select name="role" class="form-control">
                     {% for id, role in roles %}
                         <option value="{{ id }}">{{ role }}</option>
                     {% endfor %}

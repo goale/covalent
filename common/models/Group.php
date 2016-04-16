@@ -125,7 +125,7 @@ class Group extends ActiveRecord
 
         foreach ($groups->each() as $group) {
             if (!Yii::$app->user->can('editGroup', ['group' => $group]) && !empty($group->groupUsers)) {
-                $editable = $group->groupUsers[0]->role_id >= User::ROLE_MASTER;
+                $editable = $group->groupUsers[0]->role >= User::ROLE_MASTER;
             } else {
                 $editable = Yii::$app->user->can('editGroup', ['group' => $group]);
             }

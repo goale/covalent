@@ -92,7 +92,7 @@ class ProjectRule extends Rule
         }
 
         if ($groupRole = GroupUser::findOne(['user_id' => $userId, 'group_id' => $group->id])) {
-            return $groupRole->role_id;
+            return $groupRole->role;
         }
 
         return User::ROLE_USER;

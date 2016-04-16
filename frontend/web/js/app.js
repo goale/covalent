@@ -112,24 +112,24 @@ var GroupUserControls = {
         });
 
         this.$groupAddUserForm.submit(function () {
-            self.addUserToGroup($(this).serialize());
+            self.addMember($(this).serialize());
             return false;
         });
 
         $(this.usersContainer).on('click', this.removeBtn, function () {
             var $item = $(this).closest(self.userItem);
-            self.removeUserFromGroup($item.data('user'), function () {
+            self.deleteMember($item.data('user'), function () {
                 $item.remove();
             });
         });
 
         $(this.usersContainer).on('change', this.roleSelect, function () {
             var $item = $(this).closest(self.userItem);
-            self.changeUserRole($item.data('user'), $(this).val());
+            self.changeMemberRole($item.data('user'), $(this).val());
         });
     },
 
-    addUserToGroup: function (data) {
+    addMember: function (data) {
         $(this.errorBox).text('');
         var self = this;
 
@@ -149,7 +149,7 @@ var GroupUserControls = {
         });
     },
 
-    removeUserFromGroup: function (user, callback) {
+    deleteMember: function (user, callback) {
         $.ajax({
             url: this.URL,
             type: 'DELETE',
@@ -163,7 +163,7 @@ var GroupUserControls = {
         });
     },
 
-    changeUserRole: function (user, role) {
+    changeMemberRole: function (user, role) {
         $.ajax({
             url: this.URL,
             type: 'PATCH',

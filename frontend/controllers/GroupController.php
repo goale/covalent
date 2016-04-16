@@ -225,8 +225,8 @@ class GroupController extends Controller
             throw new yii\web\ForbiddenHttpException();
         }
 
-        $userId = Yii::$app->request->post('group_user');
-        $role = Yii::$app->request->post('group_user_role');
+        $userId = Yii::$app->request->post('user');
+        $role = Yii::$app->request->post('role');
 
         if ($group->isGroupOwner($userId)) {
             throw new yii\web\BadRequestHttpException('User is already a group owner');
@@ -245,18 +245,17 @@ class GroupController extends Controller
         $userGroup = new GroupUser();
         $userGroup->group_id = $group->id;
         $userGroup->user_id = $userId;
-        $userGroup->role_id = $role;
+        $userGroup->role = $role;
         if (!$userGroup->save()) {
             throw new yii\web\ServerErrorHttpException('Failed to save user');
         }
 
-        return $this->renderAjax('user.twig', [
+        return $this->renderAjax('@views/partials/user.twig', [
             'user' => [
                 'id' => $user->id,
                 'name' => $user->username,
                 'role' => $role,
             ],
-            'group' => $group->id,
             'roles' => User::$roles
         ]);
     }
@@ -329,11 +328,11 @@ class GroupController extends Controller
             throw new yii\base\InvalidParamException('User or role does not exist');
         }
 
-        if ($groupUser->role_id == $role) {
+        if ($groupUser->role == $role) {
             return true;
         }
 
-        $groupUser->role_id = $role;
+        $groupUser->role = $role;
 
         return $groupUser->save();
     }

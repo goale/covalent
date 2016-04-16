@@ -27,7 +27,7 @@ trait MemberTrait
             return [
                 'id' => $item->user_id,
                 'name' => $users[$item->user_id]['username'],
-                'role' => $item->role_id
+                'role' => $item->role,
             ];
         }, $usersModel);
     }

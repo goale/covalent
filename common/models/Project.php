@@ -217,6 +217,6 @@ class Project extends ActiveRecord
      */
     public function isProjectOwner($userId)
     {
-        return $this->user_id = Yii::$app->user->id;
+        return $this->user_id == $userId;
     }
 }
