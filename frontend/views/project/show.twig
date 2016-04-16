@@ -11,10 +11,18 @@
             </div>
         {% endif %}
         {% if canEdit %}
-        <ul class="nav nav-tabs">
-                <li role="presentation" class="active"><a href="#">Users</a></li>
+        <ul class="nav nav-tabs group-detail__tabs">
+            <li role="presentation" class="active" data-tab="project-members">
+                <a href="#">{{ t('app', 'Members') }}</a>
+            </li>
+            {% if groupUsers is not empty %}
+            <li role="presentation" data-tab="group-members">
+                <a href="#">{{ t('app', 'Group') }}</a>
+            </li>
+            {% endif %}
         </ul>
-            <div class="group-detail__users">
+        <div class="group-detail__members">
+            <div class="group-detail__users" id="project-members">
                 <div class="group-detail__users-item">
                     <div class="group-detail__users-item-first">
                         <a href="#" target="_blank">{{  owner.username }}</a>
@@ -45,6 +53,15 @@
                     </form>
                 </div>
             </div>
+            {% if groupUsers is not empty %}
+                <div class="group-detail__users-group" id="group-members" style="display: none">
+                    {% for user in groupUsers %}
+                        <a href="#">{{ user.name }}</a>
+                        <span>{{ roles[user.role] }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
         {% endif %}
     </div>
 </div>

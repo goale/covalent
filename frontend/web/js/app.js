@@ -1,7 +1,36 @@
 $(document).ready(function () {
+    TabControls.initialize();
     GroupForm.initialize();
     GroupUserControls.initialize();
 });
+
+var TabControls = {
+    $tabControls: $('.group-detail__tabs'),
+
+    initialize: function () {
+        var self = this;
+
+        this.$tabControls.on('click', 'li', function (e) {
+            e.preventDefault();
+            var $tab = $(this);
+
+            if ($tab.hasClass('active')) {
+                return false;
+            }
+
+            $tab
+                .addClass('active')
+                .siblings().removeClass('active');
+
+            self.handleTabContainers($tab);
+        });
+    },
+
+    handleTabContainers: function (tab) {
+        var containerId = tab.data('tab');
+        $('#' + containerId).show().siblings().hide();
+    }
+};
 
 var GroupForm = {
 
