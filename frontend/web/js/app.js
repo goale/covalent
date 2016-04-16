@@ -66,7 +66,7 @@ var GroupForm = {
             type: 'PATCH',
             dataType: 'json',
             success: function (data) {
-                if (data.needRedirect) {
+                if (data.hasOwnProperty('needRedirect') && data.needRedirect) {
                     window.location = '/groups';
                 }
             }
@@ -101,6 +101,8 @@ var GroupUserControls = {
     initialize: function () {
         var self = this;
 
+        this.URL = this.$usersAddForm.data('url');
+
         this.$usersAddForm.on('change', '.group-detail__users-add-user', function () {
             if ($(this).val().length > 0) {
                 $(self.userAddBtn).prop('disabled', false);
@@ -116,14 +118,14 @@ var GroupUserControls = {
 
         $(this.usersContainer).on('click', this.removeBtn, function () {
             var $item = $(this).closest(self.userItem);
-            self.removeUserFromGroup($item.data('user'), $item.data('group'), function () {
+            self.removeUserFromGroup($item.data('user'), function () {
                 $item.remove();
             });
         });
 
         $(this.usersContainer).on('change', this.roleSelect, function () {
             var $item = $(this).closest(self.userItem);
-            self.changeUserRole(self.$groupAddUserForm.data('group'), $item.data('user'), $(this).val());
+            self.changeUserRole($item.data('user'), $(this).val());
         });
     },
 
@@ -132,7 +134,7 @@ var GroupUserControls = {
         var self = this;
 
         $.ajax({
-            url: '/groups/' + this.$groupAddUserForm.data('group') + '/users',
+            url: this.URL,
             type: 'POST',
             data: data,
             dataType: 'html',
@@ -147,9 +149,9 @@ var GroupUserControls = {
         });
     },
 
-    removeUserFromGroup: function (user, group, callback) {
+    removeUserFromGroup: function (user, callback) {
         $.ajax({
-            url: '/groups/' + group + '/users',
+            url: this.URL,
             type: 'DELETE',
             data: 'user=' + user,
             dataType: 'json',
@@ -161,9 +163,9 @@ var GroupUserControls = {
         });
     },
 
-    changeUserRole: function (group, user, role) {
+    changeUserRole: function (user, role) {
         $.ajax({
-            url: '/groups/' + group + '/users',
+            url: this.URL,
             type: 'PATCH',
             data: 'user=' + user + '&role=' + role,
             dataType: 'json'

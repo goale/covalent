@@ -35,10 +35,10 @@
 
         </div>
         {% for user in groupUsers %}
-            {{ include('user.twig', { 'group': group.id, 'user' : user }) }}
+            {{ include('user.twig', { 'user' : user }) }}
         {% endfor %}
-        <div class="group-detail__users-add">
-            <form name="group-user-add" class="form-inline" data-group="{{ group.id }}">
+        <div class="group-detail__users-add" data-url="/groups/{{ group.code }}/users">
+            <form name="group-user-add" class="form-inline">
                 <select name="group_user" class="form-control group-detail__users-add-user">
                     <option value="">{{ t('app', 'Choose user') }}</option>
                     {% for user in users %}

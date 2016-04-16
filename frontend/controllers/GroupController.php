@@ -206,20 +206,20 @@ class GroupController extends Controller
     /**
      * Adds user to a group via ajax
      * Users in group must be unique
-     * @param int $group
+     * @param string $code
      * @return array
      * @throws \HttpInvalidParamException
      * @throws yii\web\BadRequestHttpException
      * @throws yii\web\ForbiddenHttpException
      * @throws yii\web\ServerErrorHttpException
      */
-    public function actionAddUser($group)
+    public function actionAddUser($code)
     {
         if (!Yii::$app->request->isAjax || !Yii::$app->request->isPost) {
             throw new yii\web\BadRequestHttpException();
         }
 
-        $group = Group::findOne($group);
+        $group = Group::findByCode($code);
 
         if (!Yii::$app->user->can('editGroup', ['group' => $group])) {
             throw new yii\web\ForbiddenHttpException();
@@ -263,14 +263,14 @@ class GroupController extends Controller
 
     /**
      * Deletes user from group if he is not owner
-     * @param $group
+     * @param $code
      * @return array
      * @throws \Exception
      * @throws yii\web\BadRequestHttpException
      * @throws yii\web\ForbiddenHttpException
      * @throws yii\web\ServerErrorHttpException
      */
-    public function actionDeleteUser($group)
+    public function actionDeleteUser($code)
     {
         Yii::$app->response->format = yii\web\Response::FORMAT_JSON;
 
@@ -278,7 +278,7 @@ class GroupController extends Controller
             throw new yii\web\BadRequestHttpException();
         }
 
-        $group = Group::findOne($group);
+        $group = Group::findByCode($code);
 
         if (!Yii::$app->user->can('editGroup', ['group' => $group])) {
             throw new yii\web\ForbiddenHttpException();
@@ -301,12 +301,12 @@ class GroupController extends Controller
     }
 
     /**
-     * @param $group
+     * @param string $code
      * @return bool
      * @throws yii\web\BadRequestHttpException
      * @throws yii\web\ForbiddenHttpException
      */
-    public function actionChangeUserRole($group)
+    public function actionChangeUserRole($code)
     {
         Yii::$app->response->format = yii\web\Response::FORMAT_JSON;
 
@@ -314,14 +314,16 @@ class GroupController extends Controller
             throw new yii\web\BadRequestHttpException();
         }
 
-        if (!Yii::$app->user->can('editGroup', ['groupId' => $group])) {
+        $group = Group::findByCode($code);
+
+        if (!Yii::$app->user->can('editGroup', ['group' => $group])) {
             throw new yii\web\ForbiddenHttpException();
         }
 
         $userId = Yii::$app->request->post('user');
         $role = Yii::$app->request->post('role');
 
-        $groupUser = GroupUser::findOne(['group_id' => $group, 'user_id' => $userId]);
+        $groupUser = GroupUser::findOne(['group_id' => $group->id, 'user_id' => $userId]);
 
         if (!$groupUser || !isset(User::$roles[$role])) {
             throw new yii\base\InvalidParamException('User or role does not exist');
