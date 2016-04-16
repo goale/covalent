@@ -4,6 +4,7 @@ namespace frontend\controllers;
 
 
 use common\models\Group;
+use common\models\GroupUser;
 use common\models\Project;
 use common\models\ProjectUser;
 use common\models\User;
@@ -65,11 +66,18 @@ class ProjectController extends Controller
         if ($canEdit) {
             $users = ArrayHelper::index(User::getAll(), 'id');
 
-            $groupUsers = $this->buildMembersWithRoles($users, $project->projectUsers);
+            $projectUsers = $this->buildMembersWithRoles($users, $project->projectUsers);
 
             if (isset($users[$project->user_id])) {
                 $owner = $users[$project->user_id];
                 unset($users[$project->user_id]);
+            }
+
+            if ($project->group_id) {
+                $groupUsers = $this->buildMembersWithRoles(
+                    $users,
+                    GroupUser::findAll(['group_id' => $project->group_id])
+                );
             }
         }
 
@@ -79,6 +87,7 @@ class ProjectController extends Controller
             'roles',
             'users',
             'owner',
+            'projectUsers',
             'groupUsers'
         ));
     }

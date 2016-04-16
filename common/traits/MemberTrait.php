@@ -2,8 +2,6 @@
 
 namespace common\traits;
 
-use yii\db\ActiveRecord;
-
 trait MemberTrait
 {
     public function addMember()
@@ -14,7 +12,7 @@ trait MemberTrait
     /**
      * Attach role to group/project members
      * @param array $users
-     * @param ActiveRecord[] $usersModel
+     * @param $usersModel
      * @return array
      */
     public function buildMembersWithRoles(array $users, $usersModel)
