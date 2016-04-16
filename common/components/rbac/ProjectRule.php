@@ -66,13 +66,13 @@ class ProjectRule extends Rule
             return User::ROLE_OWNER;
         }
 
-        if ($projectRole = ProjectUser::findOne(['user_id' => $userId, 'project_id' => $project->id])) {
-            return $projectRole->role;
-        }
-
         if ($project->group_id > 0) {
             $group = Group::findOne($project->group_id);
             return $this->getUserGroupRole($group);
+        }
+
+        if ($projectRole = ProjectUser::findOne(['user_id' => $userId, 'project_id' => $project->id])) {
+            return $projectRole->role;
         }
 
         return User::ROLE_USER;

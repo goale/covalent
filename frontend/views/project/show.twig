@@ -30,7 +30,7 @@
                     </div>
 
                 </div>
-                {% for user in groupUsers %}
+                {% for user in projectUsers %}
                     {{ include('@views/partials/user.twig', { 'user' : user }) }}
                 {% endfor %}
                 <div class="group-detail__users-add" data-url="{{ project.slug }}/users">
