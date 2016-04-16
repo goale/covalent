@@ -106,7 +106,13 @@ class GroupController extends Controller
             throw new yii\web\ForbiddenHttpException();
         }
 
-        $group->user_id = Yii::$app->request->post('user');
+        $userId = Yii::$app->request->post('user');
+
+        if ($groupUser = GroupUser::findOne(['user_id' => $userId, 'group_id' => $group->id])) {
+            $groupUser->delete();
+        }
+
+        $group->user_id = $userId;
 
         if ($group->save()) {
             return [
