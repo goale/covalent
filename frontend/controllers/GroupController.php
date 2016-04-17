@@ -182,7 +182,7 @@ class GroupController extends Controller
         $canEdit = Yii::$app->user->can('editGroup', ['group' => $group]);
 
         if ($group && Yii::$app->user->can('viewGroup', ['group' => $group])) {
-            $projects = Project::findAll(['group_id', $group->id]);
+            $projects = Project::findAll(['group_id' => $group->id]);
 
             if ($canEdit) {
                 $users = ArrayHelper::index(User::getAll(), 'id');

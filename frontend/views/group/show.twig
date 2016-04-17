@@ -9,6 +9,7 @@
         {{ group.description | raw }}
     </div>
     {% endif %}
+    {% if canEdit %}
     <div class="zero-preview">
         <a
             href="/projects/new?group={{ group.id }}"
@@ -16,6 +17,7 @@
                 {{ t('app', 'Add project') }}
         </a>
     </div>
+    {% endif %}
     <ul class="nav nav-tabs group-detail__tabs">
         <li role="presentation" class="active" data-tab="projects">
             <a href="#">{{ t('app', 'Projects') }}</a>
