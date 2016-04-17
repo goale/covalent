@@ -132,18 +132,25 @@
     margin-bottom: 40px;
 }
 
-.group-detail__users-item {
+.group-detail__no-projects {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 20px;
+    color: #bbb;
+}
+
+.group-detail__item {
     position: relative;
     padding: 20px 0;
     border-bottom: 1px solid #e8e8e8;
 }
 
-.group-detail__users-item-first a {
-    line-height: 34px;
-    font-size: 18px;
+.group-detail__item-first a {
+    line-height: 32px;
+    font-size: 16px;
 }
 
-.group-detail__users-item_controls {
+.group-detail__item-controls {
     float: right;
     margin-left: 15px;
 }

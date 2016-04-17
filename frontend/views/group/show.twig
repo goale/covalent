@@ -28,16 +28,25 @@
     </ul>
     <div class="group-detail__members">
         <div class="group-detail__projects" id="projects">
-            No projects
+        {% if projects is empty %}
+            <p class="group-detail__no-projects">{{ t('app', 'No projects') }}</p>
+        {% else %}
+            {% for project in projects %}
+                <div class="group-detail__item">
+                    <div class="group-detail__item-first">
+                        <a href="{{ project.slug }}">{{  project.name }}</a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
         </div>
     {% if canEdit %}
         <div class="group-detail__users" id="members" style="display: none">
-            <div class="group-detail__users-item">
-                <div class="group-detail__users-item-first">
+            <div class="group-detail__item">
+                <div class="group-detail__item-first">
                     <a href="#" target="_blank">{{  owner.username }}</a>
                     <span class="label label-success">{{ t('app', 'Owner') }}</span>
                 </div>
-
             </div>
             {% for user in groupUsers %}
                 {{ include('@views/partials/user.twig', { 'user' : user }) }}

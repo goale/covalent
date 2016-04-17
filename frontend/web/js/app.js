@@ -121,7 +121,7 @@ var GroupUserControls = {
     $usersAddForm: $('.group-detail__users-add'),
 
     usersContainer: '.group-detail__users',
-    userItem: '.group-detail__users-item',
+    userItem: '.group-detail__item',
     removeBtn: '.group-detail__users-leave',
     roleSelect: '.group-detail__users-role',
     userAddBtn: '.group-detail__users-add-btn',

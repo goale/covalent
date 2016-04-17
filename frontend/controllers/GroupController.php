@@ -4,6 +4,7 @@ namespace frontend\controllers;
 
 use common\models\Group;
 use common\models\GroupUser;
+use common\models\Project;
 use common\models\User;
 use common\traits\MemberTrait;
 use common\traits\StringyTrait;
@@ -181,7 +182,7 @@ class GroupController extends Controller
         $canEdit = Yii::$app->user->can('editGroup', ['group' => $group]);
 
         if ($group && Yii::$app->user->can('viewGroup', ['group' => $group])) {
-            $users = [];
+            $projects = Project::findAll(['group_id', $group->id]);
 
             if ($canEdit) {
                 $users = ArrayHelper::index(User::getAll(), 'id');
@@ -195,6 +196,7 @@ class GroupController extends Controller
             }
 
             return $this->render('show.twig', array_merge(compact(
+                'projects',
                 'group',
                 'users',
                 'groupUsers',
