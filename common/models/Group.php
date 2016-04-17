@@ -143,6 +143,22 @@ class Group extends ActiveRecord
     }
 
     /**
+     * @param $userId
+     * @return array
+     */
+    public static function findByUserWithRoles($userId)
+    {
+        $groups = array_map(function ($item) {
+            return [
+                'group_id' => $item['id'],
+                'role' => User::ROLE_OWNER,
+            ];
+        }, self::find()->select('id')->where(['user_id' => $userId])->asArray()->all());
+
+        return array_merge($groups, GroupUser::findByUser($userId));
+    }
+
+    /**
      * Creates a group and links it to user
      * @return bool
      */

@@ -32,18 +32,10 @@ class ProjectController extends Controller
 
     public function actionExplore()
     {
-        $projects = Project::getPublic();
-
-        $projectsProvider = new ActiveDataProvider([
-            'query' => $projects,
-            'pagination' => [
-                'pageSize' => self::PROJECTS_PER_PAGE,
-            ],
-        ]);
+        $projects = Project::findUserProjects(Yii::$app->user->id);
 
         return $this->render('index.twig', [
-            'projects' => $projectsProvider->models,
-            'pagination' => $projectsProvider->pagination,
+            'projects' => $projects,
         ]);
     }
 

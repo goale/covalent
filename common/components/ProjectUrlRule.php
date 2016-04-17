@@ -28,8 +28,6 @@ class ProjectUrlRule implements UrlRuleInterface
                 return false;
             }
 
-            \Yii::trace($project);
-
             if (isset($matches[3])) {
                 return $this->mapProjectRoute($matches[3], $verb, $project);
             }

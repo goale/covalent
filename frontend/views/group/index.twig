@@ -15,7 +15,7 @@
         <p>{{ t('app', 'No groups') }}</p>
     {% else %}
     {% for group in groups %}
-        <div class="groups-list__item">
+        <div class="groups-list__item clearfix">
             {% if group.editable %}
             <div class="groups-list__item-controls">
                 <a class="glyph-btn" href="/groups/{{ group.code }}/edit">

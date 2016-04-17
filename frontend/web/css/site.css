@@ -74,6 +74,10 @@
     padding-top: 2px;
 }
 
+.groups-list__item-first {
+    line-height: 38px;
+}
+
 .groups-list__item a {
     font-weight: bold;
 }

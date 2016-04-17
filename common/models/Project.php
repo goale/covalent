@@ -5,6 +5,7 @@ namespace common\models;
 use common\traits\StringyTrait;
 use yii;
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 use yii\helpers\BaseInflector;
 
 /**
@@ -95,6 +96,47 @@ class Project extends ActiveRecord
         }
 
         return $projects;
+    }
+
+    /**
+     * Get all projects with user membership
+     * @param $id
+     * @return array
+     */
+    public static function findUserProjects($id)
+    {
+        $result = [];
+        $userGroups = ArrayHelper::index(Group::findByUserWithRoles($id), 'group_id');
+
+        $projects = self::find()
+            ->joinWith('projectUsers')
+            ->where(['projects.user_id' => $id])
+            ->orWhere(['project_user.user_id' => $id]);
+
+        if (!empty($userGroups)) {
+            $projects->orWhere(['projects.group_id' => array_keys($userGroups)]);
+        }
+
+        foreach ($projects->each() as $project) {
+            if ($project->isProjectOwner($id)
+                || (isset($userGroups[$project->group_id])
+                && $userGroups[$project->group_id]['role'] >= User::ROLE_MASTER)
+            ) {
+                $editable = true;
+            } elseif (!empty($project->projectUsers)) {
+                $editable = $project->projectUsers[0]->role >= User::ROLE_MASTER;
+            } else {
+                $editable = Yii::$app->user->can('editProject', compact('project'));
+            }
+            $result[] = [
+                'name' => $project->name,
+                'code' => $project->code,
+                'slug' => $project->slug,
+                'editable' => $editable,
+            ];
+        }
+
+        return $result;
     }
 
     /**

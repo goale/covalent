@@ -24,6 +24,16 @@ class GroupUser extends ActiveRecord
     }
 
     /**
+     * Get group ids by user
+     * @param $id
+     * @return array|yii\db\ActiveRecord[]
+     */
+    public static function findByUser($id)
+    {
+        return self::find()->select(['group_id', 'role'])->where(['user_id' => $id])->asArray()->all();
+    }
+
+    /**
      * @inheritdoc
      */
     public function rules()
