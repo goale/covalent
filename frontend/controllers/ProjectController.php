@@ -2,7 +2,6 @@
 
 namespace frontend\controllers;
 
-
 use common\models\Group;
 use common\models\GroupUser;
 use common\models\Project;
@@ -11,9 +10,7 @@ use common\models\User;
 use common\traits\MemberTrait;
 use common\traits\StringyTrait;
 use yii;
-use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Url;
 use yii\web\Controller;
 
 class ProjectController extends Controller
@@ -31,7 +28,7 @@ class ProjectController extends Controller
         return $this->render('index', ['projects' => $projects]);
     }
 
-    public function actionExplore()
+    public function actionMy()
     {
         $projects = Project::findUserProjects(Yii::$app->user->id);
 

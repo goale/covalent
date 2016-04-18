@@ -6,7 +6,7 @@ return [
     //'enableStrictParsing' => true,
     'rules' => [
         'GET projects/new' => 'project/new',
-        'GET projects' => 'project/explore',
+        'GET projects' => 'project/my',
         'POST projects' => 'project/create',
         'POST groups/<code>/users' => 'group/add-user',
         'PATCH groups/<code>/users' => 'group/change-user-role',
