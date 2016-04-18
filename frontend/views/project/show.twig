@@ -9,6 +9,18 @@
             <div class="group-detail__description highlight">
                 {{ project.description | raw }}
             </div>
+            <div class="row group-detail__urls">
+                {% if project.url is not empty %}
+                <div class="col-lg-6">
+                    <input type="text" class="form-control select-on-focus" readonly value="{{ project.url }}">
+                </div>
+                {% endif %}
+                {% if project.source_url is not empty %}
+                <div class="col-lg-6">
+                    <input type="text" class="form-control select-on-focus" readonly value="{{ project.source_url }}">
+                </div>
+                {% endif %}
+            </div>
         {% endif %}
         {% if canEdit %}
         <ul class="nav nav-tabs group-detail__tabs">

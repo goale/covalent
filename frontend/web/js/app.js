@@ -1,4 +1,11 @@
 $(document).ready(function () {
+    // Select text on focus
+    $('.select-on-focus').on('focusin', function () {
+        return $(this).select().one('mouseup', function (e) {
+            return e.preventDefault()
+        });
+    });
+
     TabControls.initialize();
     GroupForm.initialize();
     GroupUserControls.initialize();

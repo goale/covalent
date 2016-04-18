@@ -147,6 +147,10 @@
     color: #bbb;
 }
 
+.group-detail__urls {
+    margin-bottom: 40px;
+}
+
 .group-detail__item {
     position: relative;
     padding: 20px 0;
