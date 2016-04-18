@@ -62,7 +62,7 @@ class Project extends ActiveRecord
     public function afterDelete()
     {
         if ($this->group_id > 0) {
-            Group::findOne($this->group_id)->updateCounters(['projects_count', -1]);
+            Group::findOne($this->group_id)->updateCounters(['projects_count' => -1]);
         }
 
         parent::afterDelete();

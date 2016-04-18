@@ -45,6 +45,10 @@ var GroupForm = {
     previewMode: false,
 
     initialize: function () {
+        this.EDIT_URL = this.$groupForm.data('url');
+        this.DELETE_URL = this.$deleteGroupBtn.data('url');
+        this.BACK_URL = this.$deleteGroupBtn.data('back-url');
+
         this.$previewBtn.on('click', function () {
             this.togglePreview();
         }.bind(this));
@@ -55,20 +59,18 @@ var GroupForm = {
 
         this.$changeOwnerBtn.on('click', function () {
             var newOwner = this.$changeOwnerSelect.val(),
-                groupId = this.$groupForm.data('group'),
                 username = this.$changeOwnerSelect.children(':selected').text().trim();
 
             if (prompt('Type selected username to confirm') === username) {
-                this.changeGroupOwner(groupId, newOwner);
+                this.changeGroupOwner(newOwner);
             }
         }.bind(this));
 
         this.$deleteGroupBtn.on('click', function () {
-            var groupId = this.$groupForm.data('group'),
-                name = this.$groupForm.data('name');
+            var name = this.$groupForm.data('name');
 
             if (prompt('Type group name to confirm deletion') === name) {
-                this.deleteGroup(groupId);
+                this.deleteGroup();
             }
         }.bind(this));
     },
@@ -88,27 +90,29 @@ var GroupForm = {
         this.previewMode = !this.previewMode;
     },
 
-    changeGroupOwner: function (group, user) {
+    changeGroupOwner: function (user) {
+        var self = this;
         $.ajax({
-            url: '/groups/' + group + '/edit',
+            url: this.EDIT_URL,
             data: 'type=owner&user=' + user,
             type: 'PATCH',
             dataType: 'json',
             success: function (data) {
                 if (data.hasOwnProperty('needRedirect') && data.needRedirect) {
-                    window.location = '/groups';
+                    window.location = self.BACK_URL;
                 }
             }
         });
     },
-    deleteGroup: function (group) {
+    deleteGroup: function () {
+        var self = this;
         $.ajax({
-            url: '/groups/' + group + '/delete',
+            url: this.DELETE_URL,
             type: 'DELETE',
             dataType: 'json',
             success: function (data) {
                 if (data.success) {
-                    window.location = '/groups';
+                    window.location = self.BACK_URL;
                 }
             }
         });

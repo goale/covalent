@@ -32,6 +32,10 @@ class ProjectUrlRule implements UrlRuleInterface
                 return $this->mapProjectRoute($matches[3], $verb, $project);
             }
 
+            if ($verb == 'DELETE') {
+                return ['project/delete', compact('project')];
+            }
+
             return ['project/show', compact('project')];
         }
 
@@ -60,7 +64,10 @@ class ProjectUrlRule implements UrlRuleInterface
             }
         }
 
-        // TODO: add /edit mappings
+        if ($route == 'edit') {
+            return ['project/edit', compact('project')];
+        }
+
         return false;
     }
 

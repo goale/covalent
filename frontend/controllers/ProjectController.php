@@ -13,6 +13,7 @@ use common\traits\StringyTrait;
 use yii;
 use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 use yii\web\Controller;
 
 class ProjectController extends Controller
@@ -26,7 +27,7 @@ class ProjectController extends Controller
     public function actionIndex()
     {
         $projects = Project::getAll();
-        
+
         return $this->render('index', ['projects' => $projects]);
     }
 
@@ -101,7 +102,7 @@ class ProjectController extends Controller
 
         return $this->render('new.twig', compact('model', 'namespace', 'storeInGroup'));
     }
-    
+
     public function actionCreate()
     {
         $model = new Project();
@@ -116,6 +117,81 @@ class ProjectController extends Controller
         return $this->render('new.twig', [
             'model' => $model,
         ]);
+    }
+
+    public function actionEdit(Project $project)
+    {
+        if (Yii::$app->user->can('editProject', compact('project'))) {
+            if (Yii::$app->request->isPatch) {
+                if (Yii::$app->request->post('type') == 'owner') {
+                    $this->changeProjectOwner($project);
+                } else {
+                    $this->changeProjectInfo($project);
+                }
+            }
+
+            $isOwner = Yii::$app->user->can('ownProject', compact('project'));
+
+            $users = User::findAll(['status' => User::STATUS_ACTIVE]);
+
+            return $this->render('edit.twig', compact('project', 'isOwner', 'users'));
+        }
+
+        throw new yii\web\ForbiddenHttpException();
+    }
+
+    /**
+     * @param Project $project
+     * @return array
+     * @throws \Exception
+     * @throws yii\web\ForbiddenHttpException
+     * @throws yii\web\ServerErrorHttpException
+     */
+    private function changeProjectOwner(Project $project)
+    {
+        Yii::$app->response->format = yii\web\Response::FORMAT_JSON;
+
+        if (!Yii::$app->user->can('ownProject', compact('project'))) {
+            throw new yii\web\ForbiddenHttpException();
+        }
+
+        $userId = Yii::$app->request->post('user');
+
+        if ($projectUser = ProjectUser::findOne(['user_id' => $userId, 'project_id' => $project->id])) {
+            $projectUser->delete();
+        }
+
+        $project->user_id = $userId;
+
+        if ($project->save()) {
+            return [
+                'needRedirect' => !Yii::$app->user->can('ownGroup', compact('project')),
+            ];
+        }
+
+        throw new yii\web\ServerErrorHttpException();
+    }
+
+    /**
+     * @param Project $project
+     * @return yii\web\Response
+     */
+    private function changeProjectInfo(Project $project)
+    {
+        $project->load(Yii::$app->request->post());
+        $project->save();
+        return $this->redirect($project->slug);
+    }
+
+    public function actionDelete(Project $project)
+    {
+        Yii::$app->response->format = yii\web\Response::FORMAT_JSON;
+
+        if (!Yii::$app->user->can('ownProject', compact('project'))) {
+            throw new yii\web\ForbiddenHttpException();
+        }
+
+        return ['success' => $project->delete()];
     }
 
     /**

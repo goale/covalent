@@ -115,6 +115,10 @@
     margin-bottom: 20px;
 }
 
+.group-form__edit .row:first-child {
+    margin-bottom: 20px;
+}
+
 .group-detail__users-add-error {
     margin-left: 10px;
 }
