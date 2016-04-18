@@ -10,6 +10,7 @@ use common\models\User;
 use common\traits\MemberTrait;
 use common\traits\StringyTrait;
 use yii;
+use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 
@@ -20,6 +21,39 @@ class ProjectController extends Controller
     const PROJECTS_PER_PAGE = 20;
 
     public $layout = 'main.twig';
+
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['add-member', 'create'],
+                        'verbs' => ['POST'],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['change-member-role'],
+                        'verbs' => ['PATCH'],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['delete-member', 'delete'],
+                        'verbs' => ['DELETE'],
+                    ],
+                ],
+            ],
+        ];
+    }
 
     public function actionIndex()
     {

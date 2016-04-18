@@ -32,7 +32,21 @@ class GroupController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['index', 'show', 'new', 'create', 'add-user', 'delete-user', 'change-user-role', 'edit', 'delete'],
+                        'actions' => ['add-user', 'create'],
+                        'verbs' => ['POST'],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['change-user-role'],
+                        'verbs' => ['PATCH'],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['delete-user', 'delete'],
+                        'verbs' => ['DELETE'],
+                    ],
+                    [
+                        'allow' => true,
                         'roles' => ['@'],
                     ],
                 ],
@@ -223,7 +237,7 @@ class GroupController extends Controller
      */
     public function actionAddUser($code)
     {
-        if (!Yii::$app->request->isAjax || !Yii::$app->request->isPost) {
+        if (!Yii::$app->request->isAjax) {
             throw new yii\web\BadRequestHttpException();
         }
 
@@ -281,7 +295,7 @@ class GroupController extends Controller
     {
         Yii::$app->response->format = yii\web\Response::FORMAT_JSON;
 
-        if (!Yii::$app->request->isAjax || !Yii::$app->request->isDelete) {
+        if (!Yii::$app->request->isAjax) {
             throw new yii\web\BadRequestHttpException();
         }
 
@@ -317,7 +331,7 @@ class GroupController extends Controller
     {
         Yii::$app->response->format = yii\web\Response::FORMAT_JSON;
 
-        if (!Yii::$app->request->isAjax || !Yii::$app->request->isPatch) {
+        if (!Yii::$app->request->isAjax) {
             throw new yii\web\BadRequestHttpException();
         }
 
