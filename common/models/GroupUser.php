@@ -11,7 +11,7 @@ use yii\db\ActiveRecord;
  * @property integer $id
  * @property integer $group_id
  * @property integer $user_id
- * @property integer $role_id
+ * @property integer $role
  */
 class GroupUser extends ActiveRecord
 {
@@ -24,13 +24,23 @@ class GroupUser extends ActiveRecord
     }
 
     /**
+     * Get group ids by user
+     * @param $id
+     * @return array|yii\db\ActiveRecord[]
+     */
+    public static function findByUser($id)
+    {
+        return self::find()->select(['group_id', 'role'])->where(['user_id' => $id])->asArray()->all();
+    }
+
+    /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
             [['group_id', 'user_id'], 'required'],
-            [['group_id', 'user_id', 'role_id'], 'integer']
+            [['group_id', 'user_id', 'role'], 'integer']
         ];
     }
 
@@ -72,7 +82,7 @@ class GroupUser extends ActiveRecord
             'id' => Yii::t('app', 'ID'),
             'group_id' => Yii::t('app', 'Group ID'),
             'user_id' => Yii::t('app', 'User ID'),
-            'role_id' => Yii::t('app', 'Role ID'),
+            'role' => Yii::t('app', 'Role'),
         ];
     }
 }

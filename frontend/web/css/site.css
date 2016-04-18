@@ -74,6 +74,10 @@
     padding-top: 2px;
 }
 
+.groups-list__item-first {
+    line-height: 38px;
+}
+
 .groups-list__item a {
     font-weight: bold;
 }
@@ -111,6 +115,10 @@
     margin-bottom: 20px;
 }
 
+.group-form__edit .row:first-child {
+    margin-bottom: 20px;
+}
+
 .group-detail__users-add-error {
     margin-left: 10px;
 }
@@ -132,18 +140,29 @@
     margin-bottom: 40px;
 }
 
-.group-detail__users-item {
+.group-detail__no-projects {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 20px;
+    color: #bbb;
+}
+
+.group-detail__urls {
+    margin-bottom: 40px;
+}
+
+.group-detail__item {
     position: relative;
     padding: 20px 0;
     border-bottom: 1px solid #e8e8e8;
 }
 
-.group-detail__users-item-first a {
-    line-height: 34px;
-    font-size: 18px;
+.group-detail__item-first a {
+    line-height: 32px;
+    font-size: 16px;
 }
 
-.group-detail__users-item_controls {
+.group-detail__item-controls {
     float: right;
     margin-left: 15px;
 }

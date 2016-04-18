@@ -5,8 +5,9 @@ namespace common\components\rbac;
 
 use common\models\Group;
 use common\models\GroupUser;
+use common\models\Project;
+use common\models\ProjectUser;
 use common\models\User;
-use common\modules\Project\models\Project;
 use yii;
 use yii\rbac\Item;
 use yii\rbac\Rule;
@@ -30,7 +31,7 @@ class ProjectRule extends Rule
         if (Yii::$app->user->identity->role == User::ROLE_ADMIN) {
             $role = Yii::$app->user->identity->role;
         } else if (isset($params['project'])) {
-            $role = $this->getUserRole($params['project']);
+            $role = $this->getUserProjectRole($params['project']);
         } else if (isset($params['group'])) {
             $role = $this->getUserGroupRole($params['group']);
         } else {
@@ -57,13 +58,24 @@ class ProjectRule extends Rule
      * @param Project $project
      * @return int user role
      */
-    protected function getUserRole($project)
+    protected function getUserProjectRole($project)
     {
-        if ($project->group_id > 0) {
-            return $this->getUserGroupRole($project->group_id);
+        $userId = Yii::$app->user->id;
+
+        if ($project->isProjectOwner($userId)) {
+            return User::ROLE_OWNER;
         }
 
-        return $this->getUserProjectRole($project);
+        if ($project->group_id > 0) {
+            $group = Group::findOne($project->group_id);
+            return $this->getUserGroupRole($group);
+        }
+
+        if ($projectRole = ProjectUser::findOne(['user_id' => $userId, 'project_id' => $project->id])) {
+            return $projectRole->role;
+        }
+
+        return User::ROLE_USER;
     }
 
     /**
@@ -80,21 +92,7 @@ class ProjectRule extends Rule
         }
 
         if ($groupRole = GroupUser::findOne(['user_id' => $userId, 'group_id' => $group->id])) {
-            return $groupRole->role_id;
-        }
-
-        return User::ROLE_USER;
-    }
-
-    /**
-     * @param Project $project
-     * @return int
-     */
-    private function getUserProjectRole($project)
-    {
-        // TODO: implement project roles (owner, project->user relations, public projects, etc.)
-        if ($project->user_id == Yii::$app->user->id) {
-            return User::ROLE_MASTER;
+            return $groupRole->role;
         }
 
         return User::ROLE_USER;

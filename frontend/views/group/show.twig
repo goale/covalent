@@ -9,6 +9,7 @@
         {{ group.description | raw }}
     </div>
     {% endif %}
+    {% if canEdit %}
     <div class="zero-preview">
         <a
             href="/projects/new?group={{ group.id }}"
@@ -16,46 +17,62 @@
                 {{ t('app', 'Add project') }}
         </a>
     </div>
-    <ul class="nav nav-tabs">
-        <li role="presentation"><a href="#">Projects</a></li>
+    {% endif %}
+    <ul class="nav nav-tabs group-detail__tabs">
+        <li role="presentation" class="active" data-tab="projects">
+            <a href="#">{{ t('app', 'Projects') }}</a>
+        </li>
         {% if canEdit %}
-            <li role="presentation" class="active"><a href="#">Users</a></li>
+            <li role="presentation" data-tab="members">
+                <a href="#">{{ t('app', 'Members') }}</a>
+            </li>
         {% endif %}
     </ul>
-    <div class="group-detail__projects" style="display: none">
-
-    </div>
+    <div class="group-detail__members">
+        <div class="group-detail__projects" id="projects">
+        {% if projects is empty %}
+            <p class="group-detail__no-projects">{{ t('app', 'No projects') }}</p>
+        {% else %}
+            {% for project in projects %}
+                <div class="group-detail__item">
+                    <div class="group-detail__item-first">
+                        <a href="{{ project.slug }}">{{  project.name }}</a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+        </div>
     {% if canEdit %}
-    <div class="group-detail__users">
-        <div class="group-detail__users-item">
-            <div class="group-detail__users-item-first">
-                <a href="#" target="_blank">{{  owner.username }}</a>
-                <span class="label label-success">{{ t('app', 'Owner') }}</span>
+        <div class="group-detail__users" id="members" style="display: none">
+            <div class="group-detail__item">
+                <div class="group-detail__item-first">
+                    <a href="#" target="_blank">{{  owner.username }}</a>
+                    <span class="label label-success">{{ t('app', 'Owner') }}</span>
+                </div>
             </div>
-
+            {% for user in groupUsers %}
+                {{ include('@views/partials/user.twig', { 'user' : user }) }}
+            {% endfor %}
+            <div class="group-detail__users-add" data-url="/groups/{{ group.code }}/users">
+                <form name="group-user-add" class="form-inline">
+                    <select name="user" class="form-control group-detail__users-add-user">
+                        <option value="">{{ t('app', 'Choose user') }}</option>
+                        {% for user in users %}
+                            <option value="{{ user.id }}">{{ user.username }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="role" class="form-control">
+                        {% for id, role in roles %}
+                            <option value="{{ id }}">{{ role }}</option>
+                        {% endfor %}
+                    </select>
+                    <button class="btn btn-primary group-detail__users-add-btn" disabled>
+                        {{ t('app', 'Add user') }}
+                    </button>
+                    <span class="group-detail__users-add-error text-danger"></span>
+                </form>
+            </div>
         </div>
-        {% for user in groupUsers %}
-            {{ include('user.twig', { 'group': group.id, 'user' : user }) }}
-        {% endfor %}
-        <div class="group-detail__users-add">
-            <form name="group-user-add" class="form-inline" data-group="{{ group.id }}">
-                <select name="group_user" class="form-control group-detail__users-add-user">
-                    <option value="">{{ t('app', 'Choose user') }}</option>
-                    {% for user in users %}
-                        <option value="{{ user.id }}">{{ user.username }}</option>
-                    {% endfor %}
-                </select>
-                <select name="group_user_role" class="form-control">
-                    {% for id, role in roles %}
-                        <option value="{{ id }}">{{ role }}</option>
-                    {% endfor %}
-                </select>
-                <button class="btn btn-primary group-detail__users-add-btn" disabled>
-                    {{ t('app', 'Add user') }}
-                </button>
-                <span class="group-detail__users-add-error text-danger"></span>
-            </form>
-        </div>
-    </div>
     {% endif %}
+    </div>
 </div>

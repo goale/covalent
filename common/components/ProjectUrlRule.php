@@ -1,10 +1,8 @@
 <?php
 
-namespace common\modules\Project\components;
+namespace common\components;
 
-use common\models\Group;
-use common\models\User;
-use common\modules\Project\models\Project;
+use common\models\Project;
 use yii\web\Request;
 use yii\web\UrlManager;
 use yii\web\UrlRuleInterface;
@@ -21,27 +19,53 @@ class ProjectUrlRule implements UrlRuleInterface
     public function parseRequest($manager, $request)
     {
         $pathInfo = $request->getPathInfo();
-        $params = [];
+        $verb = $request->getMethod();
 
-        if (preg_match('%^(\w+)(/(\w+))?$%', $pathInfo, $matches)) {
-            if (User::findByUsername($matches[1])) {
-                $params['user'] = $matches[1];
-            } elseif (Group::findByCode($matches[1])) {
-                $params['group'] = $matches[1];
-            }
+        if (preg_match('%^([\w\d-]+/[\w\d-]+)(/(\w+))?$%', $pathInfo, $matches)) {
+            $project = Project::findBySlug('/' . $matches[1]);
 
-            if (!empty($params) && isset($matches[3])) {
-                if (Project::findByCode($matches[3])) {
-                    $params['project'] = $matches[3];
-                }
-                // TODO: check rights
-            } else {
+            if (!$project) {
                 return false;
             }
 
-            if (isset($params['project'])) {
-                return ['project/project/show', $params];
+            if (isset($matches[3])) {
+                return $this->mapProjectRoute($matches[3], $verb, $project);
             }
+
+            if ($verb == 'DELETE') {
+                return ['project/delete', compact('project')];
+            }
+
+            return ['project/show', compact('project')];
+        }
+
+        return false;
+    }
+
+    /**
+     * Create route to controller mapping based on regexp matching
+     * @param $route
+     * @param $verb
+     * @param Project $project
+     * @return array|bool
+     */
+    private function mapProjectRoute($route, $verb, $project)
+    {
+        if ($route == 'users') {
+            switch ($verb) {
+                case 'POST':
+                    return ['project/add-member', compact('project')];
+                case 'PATCH':
+                    return ['project/change-member-role', compact('project')];
+                case 'DELETE':
+                    return ['project/delete-member', compact('project')];
+                default:
+                    return false;
+            }
+        }
+
+        if ($route == 'edit') {
+            return ['project/edit', compact('project')];
         }
 
         return false;
@@ -60,12 +84,12 @@ class ProjectUrlRule implements UrlRuleInterface
             if (isset($params['user'])) {
                 return $params['user'] . '/' . $params['project'];
             }
-            
+
             if (isset($params['group'])) {
                 return $params['group'] . '/' . $params['project'];
             }
         }
-        
+
         return false;
     }
 }

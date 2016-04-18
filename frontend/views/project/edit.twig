@@ -1,26 +1,32 @@
 {{ set(this, 'title', t('app', 'Edit')) }}
 {{ set(this, 'params', { 'breadcrumbs' : [
-    { 'label' : t('app', 'Groups'), 'url' : '/groups' },
-    { 'label' : group.name, 'url' : "/groups/#{group.code}" },
+    { 'label' : t('app', 'Projects'), 'url' : '/projects' },
+    { 'label' : project.name, 'url' : project.slug },
     { 'label' : this.title }
     ] }) }}
-<div class="group-form group-form__edit" data-url="/groups/{{ group.code }}/edit" data-name="{{ group.name }}">
+<div class="group-form group-form__edit" data-url="{{ project.slug }}/edit" data-name="{{ project.name }}">
     {% set form = active_form_begin({
-        'id' : 'group-edit-form',
-        'action' : "/groups/#{group.code}/edit",
-        'method' : 'PATCH'
+    'id' : 'project-edit-form',
+    'action' : "#{project.slug}/edit",
+    'method' : 'PATCH'
     }) %}
-    <div class="group-form__edit">
+    <div>
         <div class="row">
             <div class="col-lg-12">
-                {{ html.activeLabel(group, 'description') | raw }}
+                {{ html.activeLabel(project, 'description') | raw }}
                 <div class="zero-preview">
                     <span class="preview-btn group-form__preview-btn">
                         {{ t('app', 'Preview') }}
                     </span>
                 </div>
-                {{ html.activeTextarea(group, 'description', { class : 'form-control group-form__description' }) | raw }}
+                {{ html.activeTextarea(project, 'description', { class : 'form-control group-form__description' }) | raw }}
                 <figure class="highlight group-form__preview"></figure>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                {{ form.field(project, 'url') | raw }}
+                {{ form.field(project, 'source_url') | raw }}
             </div>
         </div>
     </div>
@@ -37,25 +43,23 @@
             <p class="text-danger">{{ t('app', 'All current owner rights will be discarded') }}</p>
             <select name="group-owner-change" class="form-control group-form__owner-change">
                 {% for user in users %}
-                <option value="{{ user.id }}" {{ user.id == group.user_id ? 'selected' }}>
-                    {{ user.username }}
-                </option>
+                    <option value="{{ user.id }}" {{ user.id == project.user_id ? 'selected' }}>
+                        {{ user.username }}
+                    </option>
                 {% endfor %}
             </select>
             <button class="btn btn-primary group-form__owner-change-btn" disabled>
                 {{ t('app', 'Change owner') }}
             </button>
         </div>
-        {% if group.projects_count == 0 %}
-            <div class="group-form__delete">
-                <p class="text-danger">{{ t('app', 'Removed group can not be restored') }}</p>
-                <button class="btn btn-danger group-form__delete-btn"
-                    data-url="/groups/{{ group.code }}"
-                    data-back-url="/groups">
-                    {{ t('app', 'Delete group') }}
-                </button>
-            </div>
-        {% endif %}
+        <div class="group-form__delete">
+            <p class="text-danger">{{ t('app', 'Removed project can not be restored') }}</p>
+            <button class="btn btn-danger group-form__delete-btn"
+                data-url="{{ project.slug }}"
+                data-back-url="/projects">
+                {{ t('app', 'Delete project') }}
+            </button>
+        </div>
     </div>
 </div>
 {% endif %}

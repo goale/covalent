@@ -1,7 +1,43 @@
 $(document).ready(function () {
+    // Select text on focus
+    $('.select-on-focus').on('focusin', function () {
+        return $(this).select().one('mouseup', function (e) {
+            return e.preventDefault()
+        });
+    });
+
+    TabControls.initialize();
     GroupForm.initialize();
     GroupUserControls.initialize();
 });
+
+var TabControls = {
+    $tabControls: $('.group-detail__tabs'),
+
+    initialize: function () {
+        var self = this;
+
+        this.$tabControls.on('click', 'li', function (e) {
+            e.preventDefault();
+            var $tab = $(this);
+
+            if ($tab.hasClass('active')) {
+                return false;
+            }
+
+            $tab
+                .addClass('active')
+                .siblings().removeClass('active');
+
+            self.handleTabContainers($tab);
+        });
+    },
+
+    handleTabContainers: function (tab) {
+        var containerId = tab.data('tab');
+        $('#' + containerId).show().siblings().hide();
+    }
+};
 
 var GroupForm = {
 
@@ -16,6 +52,10 @@ var GroupForm = {
     previewMode: false,
 
     initialize: function () {
+        this.EDIT_URL = this.$groupForm.data('url');
+        this.DELETE_URL = this.$deleteGroupBtn.data('url');
+        this.BACK_URL = this.$deleteGroupBtn.data('back-url');
+
         this.$previewBtn.on('click', function () {
             this.togglePreview();
         }.bind(this));
@@ -26,20 +66,18 @@ var GroupForm = {
 
         this.$changeOwnerBtn.on('click', function () {
             var newOwner = this.$changeOwnerSelect.val(),
-                groupId = this.$groupForm.data('group'),
                 username = this.$changeOwnerSelect.children(':selected').text().trim();
 
             if (prompt('Type selected username to confirm') === username) {
-                this.changeGroupOwner(groupId, newOwner);
+                this.changeGroupOwner(newOwner);
             }
         }.bind(this));
 
         this.$deleteGroupBtn.on('click', function () {
-            var groupId = this.$groupForm.data('group'),
-                name = this.$groupForm.data('name');
+            var name = this.$groupForm.data('name');
 
             if (prompt('Type group name to confirm deletion') === name) {
-                this.deleteGroup(groupId);
+                this.deleteGroup();
             }
         }.bind(this));
     },
@@ -59,27 +97,29 @@ var GroupForm = {
         this.previewMode = !this.previewMode;
     },
 
-    changeGroupOwner: function (group, user) {
+    changeGroupOwner: function (user) {
+        var self = this;
         $.ajax({
-            url: '/groups/' + group + '/edit',
+            url: this.EDIT_URL,
             data: 'type=owner&user=' + user,
             type: 'PATCH',
             dataType: 'json',
             success: function (data) {
-                if (data.needRedirect) {
-                    window.location = '/groups';
+                if (data.hasOwnProperty('needRedirect') && data.needRedirect) {
+                    window.location = self.BACK_URL;
                 }
             }
         });
     },
-    deleteGroup: function (group) {
+    deleteGroup: function () {
+        var self = this;
         $.ajax({
-            url: '/groups/' + group + '/delete',
+            url: this.DELETE_URL,
             type: 'DELETE',
             dataType: 'json',
             success: function (data) {
                 if (data.success) {
-                    window.location = '/groups';
+                    window.location = self.BACK_URL;
                 }
             }
         });
@@ -92,7 +132,7 @@ var GroupUserControls = {
     $usersAddForm: $('.group-detail__users-add'),
 
     usersContainer: '.group-detail__users',
-    userItem: '.group-detail__users-item',
+    userItem: '.group-detail__item',
     removeBtn: '.group-detail__users-leave',
     roleSelect: '.group-detail__users-role',
     userAddBtn: '.group-detail__users-add-btn',
@@ -100,6 +140,8 @@ var GroupUserControls = {
 
     initialize: function () {
         var self = this;
+
+        this.URL = this.$usersAddForm.data('url');
 
         this.$usersAddForm.on('change', '.group-detail__users-add-user', function () {
             if ($(this).val().length > 0) {
@@ -110,29 +152,29 @@ var GroupUserControls = {
         });
 
         this.$groupAddUserForm.submit(function () {
-            self.addUserToGroup($(this).serialize());
+            self.addMember($(this).serialize());
             return false;
         });
 
         $(this.usersContainer).on('click', this.removeBtn, function () {
             var $item = $(this).closest(self.userItem);
-            self.removeUserFromGroup($item.data('user'), $item.data('group'), function () {
+            self.deleteMember($item.data('user'), function () {
                 $item.remove();
             });
         });
 
         $(this.usersContainer).on('change', this.roleSelect, function () {
             var $item = $(this).closest(self.userItem);
-            self.changeUserRole(self.$groupAddUserForm.data('group'), $item.data('user'), $(this).val());
+            self.changeMemberRole($item.data('user'), $(this).val());
         });
     },
 
-    addUserToGroup: function (data) {
+    addMember: function (data) {
         $(this.errorBox).text('');
         var self = this;
 
         $.ajax({
-            url: '/groups/' + this.$groupAddUserForm.data('group') + '/users',
+            url: this.URL,
             type: 'POST',
             data: data,
             dataType: 'html',
@@ -147,9 +189,9 @@ var GroupUserControls = {
         });
     },
 
-    removeUserFromGroup: function (user, group, callback) {
+    deleteMember: function (user, callback) {
         $.ajax({
-            url: '/groups/' + group + '/users',
+            url: this.URL,
             type: 'DELETE',
             data: 'user=' + user,
             dataType: 'json',
@@ -161,9 +203,9 @@ var GroupUserControls = {
         });
     },
 
-    changeUserRole: function (group, user, role) {
+    changeMemberRole: function (user, role) {
         $.ajax({
-            url: '/groups/' + group + '/users',
+            url: this.URL,
             type: 'PATCH',
             data: 'user=' + user + '&role=' + role,
             dataType: 'json'

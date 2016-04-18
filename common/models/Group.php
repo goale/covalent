@@ -2,10 +2,9 @@
 
 namespace common\models;
 
-use common\modules\Project\models\Project;
+use common\traits\StringyTrait;
 use yii;
 use yii\db\ActiveRecord;
-use yii\helpers\BaseInflector;
 
 /**
  * This is the model class for table "groups".
@@ -24,6 +23,8 @@ use yii\helpers\BaseInflector;
  */
 class Group extends ActiveRecord
 {
+    use StringyTrait;
+
     /**
      * @inheritdoc
      */
@@ -124,7 +125,7 @@ class Group extends ActiveRecord
 
         foreach ($groups->each() as $group) {
             if (!Yii::$app->user->can('editGroup', ['group' => $group]) && !empty($group->groupUsers)) {
-                $editable = $group->groupUsers[0]->role_id >= User::ROLE_MASTER;
+                $editable = $group->groupUsers[0]->role >= User::ROLE_MASTER;
             } else {
                 $editable = Yii::$app->user->can('editGroup', ['group' => $group]);
             }
@@ -142,12 +143,28 @@ class Group extends ActiveRecord
     }
 
     /**
+     * @param $userId
+     * @return array
+     */
+    public static function findByUserWithRoles($userId)
+    {
+        $groups = array_map(function ($item) {
+            return [
+                'group_id' => $item['id'],
+                'role' => User::ROLE_OWNER,
+            ];
+        }, self::find()->select('id')->where(['user_id' => $userId])->asArray()->all());
+
+        return array_merge($groups, GroupUser::findByUser($userId));
+    }
+
+    /**
      * Creates a group and links it to user
      * @return bool
      */
     public function addGroup()
     {
-        $this->code = BaseInflector::slug(BaseInflector::transliterate($this->name), '-');
+        $this->code = $this->slugify($this->name);
         $this->users_count++;
         $this->user_id = Yii::$app->user->id;
 

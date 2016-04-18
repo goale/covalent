@@ -12,20 +12,25 @@ return [
         'type' => 2,
         'description' => 'Own group',
     ],
-    'createGroup' => [
-        'type' => 2,
-        'description' => 'Create group',
-    ],
     'doAll' => [
         'type' => 2,
         'description' => 'Do all what you want',
     ],
+    'viewProject' => [
+        'type' => 2,
+        'description' => 'View project',
+    ],
+    'editProject' => [
+        'type' => 2,
+        'description' => 'Edit project',
+    ],
+    'ownProject' => [
+        'type' => 2,
+        'description' => 'Own project',
+    ],
     'user' => [
         'type' => 1,
         'ruleName' => 'projectRule',
-        'children' => [
-            'createGroup',
-        ],
     ],
     'viewer' => [
         'type' => 1,
@@ -33,6 +38,7 @@ return [
         'children' => [
             'user',
             'viewGroup',
+            'viewProject',
         ],
     ],
     'tester' => [
@@ -48,6 +54,7 @@ return [
         'children' => [
             'tester',
             'editGroup',
+            'editProject',
         ],
     ],
     'owner' => [
@@ -56,6 +63,7 @@ return [
         'children' => [
             'master',
             'ownGroup',
+            'ownProject',
         ],
     ],
     'admin' => [

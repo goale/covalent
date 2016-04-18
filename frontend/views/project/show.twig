@@ -1,0 +1,83 @@
+{{ set(this, 'title', project.name) }}
+{{ set(this, 'params', { 'breadcrumbs' : [
+    { 'label' : t('app', 'Projects'), 'url' : '/projects' },
+    { 'label' : this.title }
+    ] }) }}
+<div class="group-detail">
+    <div class="group-detail">
+        {% if project.description is defined %}
+            <div class="group-detail__description highlight">
+                {{ project.description | raw }}
+            </div>
+            <div class="row group-detail__urls">
+                {% if project.url is not empty %}
+                <div class="col-lg-6">
+                    <input type="text" class="form-control select-on-focus" readonly value="{{ project.url }}">
+                </div>
+                {% endif %}
+                {% if project.source_url is not empty %}
+                <div class="col-lg-6">
+                    <input type="text" class="form-control select-on-focus" readonly value="{{ project.source_url }}">
+                </div>
+                {% endif %}
+            </div>
+        {% endif %}
+        {% if canEdit %}
+        <ul class="nav nav-tabs group-detail__tabs">
+            <li role="presentation" class="active" data-tab="project-members">
+                <a href="#">{{ t('app', 'Members') }}</a>
+            </li>
+            {% if groupUsers is not empty %}
+            <li role="presentation" data-tab="group-members">
+                <a href="#">{{ t('app', 'Group') }}</a>
+            </li>
+            {% endif %}
+        </ul>
+        <div class="group-detail__members">
+            <div class="group-detail__users" id="project-members">
+                <div class="group-detail__item">
+                    <div class="group-detail__item-first">
+                        <a href="#" target="_blank">{{  owner.username }}</a>
+                        <span class="label label-success">{{ t('app', 'Owner') }}</span>
+                    </div>
+
+                </div>
+                {% for user in projectUsers %}
+                    {{ include('@views/partials/user.twig', { 'user' : user }) }}
+                {% endfor %}
+                <div class="group-detail__users-add" data-url="{{ project.slug }}/users">
+                    <form name="group-user-add" class="form-inline">
+                        <select name="user" class="form-control group-detail__users-add-user">
+                            <option value="">{{ t('app', 'Choose user') }}</option>
+                            {% for user in users %}
+                                <option value="{{ user.id }}">{{ user.username }}</option>
+                            {% endfor %}
+                        </select>
+                        <select name="role" class="form-control">
+                            {% for id, role in roles %}
+                                <option value="{{ id }}">{{ role }}</option>
+                            {% endfor %}
+                        </select>
+                        <button class="btn btn-primary group-detail__users-add-btn" disabled>
+                            {{ t('app', 'Add user') }}
+                        </button>
+                        <span class="group-detail__users-add-error text-danger"></span>
+                    </form>
+                </div>
+            </div>
+            {% if groupUsers is not empty %}
+                <div class="group-detail__users-group" id="group-members" style="display: none">
+                    {% for user in groupUsers %}
+                    <div class="group-detail__item clearfix">
+                        <div class="group-detail__item-first">
+                            <a href="#" target="_blank">{{ user.name }}</a>
+                            <span class="label label-success">{{ roles[user.role] }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>

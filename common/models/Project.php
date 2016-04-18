@@ -1,10 +1,11 @@
 <?php
 
-namespace common\modules\Project\models;
+namespace common\models;
 
-use common\models\User;
-use Yii;
+use common\traits\StringyTrait;
+use yii;
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 use yii\helpers\BaseInflector;
 
 /**
@@ -23,11 +24,14 @@ use yii\helpers\BaseInflector;
  * @property string $source_url
  * @property integer $user_id
  * @property integer $group_id
+ * @property ProjectUser[] $projectUsers
  *
  * @property User $user
  */
 class Project extends ActiveRecord
 {
+    use StringyTrait;
+
     const STATUS_ACTIVE = 1;
 
     /**
@@ -38,9 +42,101 @@ class Project extends ActiveRecord
         return '{{%projects}}';
     }
 
+    /**
+     * Increment group projects count if created project is in group
+     * @param bool $insert
+     * @param array $changedAttributes
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        if ($insert && $this->group_id > 0) {
+            Group::findOne($this->group_id)->updateCounters(['projects_count' => 1]);
+        }
+
+        parent::afterSave($insert, $changedAttributes);
+    }
+
+    /**
+     *  Decrement group projects count on deleting aof  related project
+     */
+    public function afterDelete()
+    {
+        if ($this->group_id > 0) {
+            Group::findOne($this->group_id)->updateCounters(['projects_count' => -1]);
+        }
+
+        parent::afterDelete();
+    }
+
+    /**
+     * @return $this
+     */
+    public function getMembers()
+    {
+        return $this->hasMany(User::className(), ['id' => 'user_id'])
+            ->viaTable('project_user', ['project_id' => 'id']);
+    }
+
+    /**
+     * @return yii\db\ActiveQuery
+     */
+    public function getProjectUsers()
+    {
+        return $this->hasMany(ProjectUser::className(), ['project_id' => 'id']);
+    }
+
     public static function getPublic()
     {
-        return static::findAll(['active' => true]);
+        $projects = static::find();
+
+        if (!Yii::$app->user->can('doAll')) {
+            $projects
+                ->where(['public' => true])
+                ->orWhere(['user_id' => Yii::$app->user->id]);
+        }
+
+        return $projects;
+    }
+
+    /**
+     * Get all projects with user membership
+     * @param $id
+     * @return array
+     */
+    public static function findUserProjects($id)
+    {
+        $result = [];
+        $userGroups = ArrayHelper::index(Group::findByUserWithRoles($id), 'group_id');
+
+        $projects = self::find()
+            ->joinWith('projectUsers')
+            ->where(['projects.user_id' => $id])
+            ->orWhere(['project_user.user_id' => $id]);
+
+        if (!empty($userGroups)) {
+            $projects->orWhere(['projects.group_id' => array_keys($userGroups)]);
+        }
+
+        foreach ($projects->each() as $project) {
+            if ($project->isProjectOwner($id)
+                || (isset($userGroups[$project->group_id])
+                && $userGroups[$project->group_id]['role'] >= User::ROLE_MASTER)
+            ) {
+                $editable = true;
+            } elseif (!empty($project->projectUsers)) {
+                $editable = $project->projectUsers[0]->role >= User::ROLE_MASTER;
+            } else {
+                $editable = Yii::$app->user->can('editProject', compact('project'));
+            }
+            $result[] = [
+                'name' => $project->name,
+                'code' => $project->code,
+                'slug' => $project->slug,
+                'editable' => $editable,
+            ];
+        }
+
+        return $result;
     }
 
     /**
@@ -133,12 +229,12 @@ class Project extends ActiveRecord
 
     public function add()
     {
-        $this->code = BaseInflector::slug(BaseInflector::transliterate($this->name), '-');
+        $this->code = $this->slugify($this->name);
         $this->user_id = Yii::$app->user->id;
 
         if ($this->group_id > 0) {
-            if ($group = Group::findOne($this->group_id)) {
-                // TODO: check rights
+            $group = Group::findOne($this->group_id);
+            if (Yii::$app->user->can('editGroup', compact('group'))) {
                 $this->slug = '/' . $group['code'] . '/' . $this->code;
                 $this->public = 0;
             } else {
@@ -155,5 +251,14 @@ class Project extends ActiveRecord
         }
 
         return $this->save();
+    }
+
+    /**
+     * @param $userId
+     * @return int|string
+     */
+    public function isProjectOwner($userId)
+    {
+        return $this->user_id == $userId;
     }
 }
