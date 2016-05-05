@@ -3,12 +3,21 @@
 namespace common\components;
 
 use common\models\Project;
+use yii\web\CompositeUrlRule;
 use yii\web\Request;
 use yii\web\UrlManager;
-use yii\web\UrlRuleInterface;
 
-class ProjectUrlRule implements UrlRuleInterface
+/**
+ * ProjectUrlRule represents all routes relating to projects.
+ * Each project has a slug which looks like /user/project or /group/project.
+ * ProjectUrlRule has primary patterns which correspond to a slug.
+ * It is a composite URL rule which may have nested rules. Nested rules are defined like standard rules do,
+ * e.g. '<VERB> <pattern>' => '<controller>/<action>
+ */
+class ProjectUrlRule extends CompositeUrlRule
 {
+    public $rules;
+
     /**
      * Parses the given request and returns the corresponding route and parameters.
      * @param UrlManager $manager the URL manager
@@ -21,7 +30,7 @@ class ProjectUrlRule implements UrlRuleInterface
         $pathInfo = $request->getPathInfo();
         $verb = $request->getMethod();
 
-        if (preg_match('%^([\w\d-]+/[\w\d-]+)(/(\w+))?$%', $pathInfo, $matches)) {
+        if (preg_match('%^([\w\d-]+/[\w\d-]+)(/([\w/]+))?$%', $pathInfo, $matches)) {
             $project = Project::findBySlug('/' . $matches[1]);
 
             if (!$project) {
@@ -32,40 +41,25 @@ class ProjectUrlRule implements UrlRuleInterface
                 return $this->mapProjectRoute($matches[3], $verb, $project);
             }
 
-            if ($verb == 'DELETE') {
-                return ['project/delete', compact('project')];
-            }
-
-            return ['project/show', compact('project')];
+            return $this->parseProjectRequest($verb, $project);
         }
 
         return false;
     }
 
     /**
-     * Create route to controller mapping based on regexp matching
-     * @param $route
+     * Matches and parses nested projects routes
+     * @param $pattern
      * @param $verb
      * @param Project $project
      * @return array|bool
      */
-    private function mapProjectRoute($route, $verb, $project)
+    private function mapProjectRoute($pattern, $verb, $project)
     {
-        if ($route == 'users') {
-            switch ($verb) {
-                case 'POST':
-                    return ['project/add-member', compact('project')];
-                case 'PATCH':
-                    return ['project/change-member-role', compact('project')];
-                case 'DELETE':
-                    return ['project/delete-member', compact('project')];
-                default:
-                    return false;
+        foreach ($this->rules as $rule) {
+            if ($rule['pattern'] == $pattern && $rule['verb'] == $verb) {
+                return [$rule['route'], compact('project')];
             }
-        }
-
-        if ($route == 'edit') {
-            return ['project/edit', compact('project')];
         }
 
         return false;
@@ -91,5 +85,53 @@ class ProjectUrlRule implements UrlRuleInterface
         }
 
         return false;
+    }
+
+    /**
+     * Creates the URL rules that should be contained within this composite rule.
+     * Prepares each rule by defining verb, pattern and route. Verb should be in pattern part, e.g. GET pattern
+     * @return array $rules
+     */
+    protected function createRules()
+    {
+        $rules = [];
+
+        $verbs = 'GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS';
+
+        foreach ($this->rules as $key => $rule) {
+            $pattern = $key;
+
+            if (preg_match("/^((?:($verbs),)*($verbs))\\s+(.*)$/", $key, $matches)) {
+                $verb = $matches[3];
+                $pattern = $matches[4];
+            } else {
+                $verb = 'GET';
+            }
+            $rule = [
+                'pattern' => $pattern,
+                'route' => $rule,
+                'verb' => $verb,
+            ];
+
+            $rules[] = $rule;
+        }
+
+        return $rules;
+    }
+
+    /**
+     * Maps primary projects routes based on verb
+     * @param $verb
+     * @param $project
+     * @return array
+     */
+    private function parseProjectRequest($verb, $project)
+    {
+        switch ($verb) {
+            case 'DELETE':
+                return ['project/delete', compact('project')];
+            default:
+                return ['project/show', compact('project')];
+        }
     }
 }

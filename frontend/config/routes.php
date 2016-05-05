@@ -20,6 +20,13 @@ return [
         'GET users' => 'user/index',
         [
             'class' => 'common\components\ProjectUrlRule',
+            'rules' => [
+                'POST users' => 'project/add-member',
+                'PATCH users' => 'project/change-member-role',
+                'DELETE users' => 'project/delete-member',
+                'GET edit' => 'project/edit',
+                'GET features/new' => 'feature/new',
+            ],
         ]
     ],
 ];
