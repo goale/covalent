@@ -74,14 +74,15 @@ class ProjectUrlRule extends CompositeUrlRule
      */
     public function createUrl($manager, $route, $params)
     {
-        if ($route == 'project/show') {
-            if (isset($params['user'])) {
-                return $params['user'] . '/' . $params['project'];
+        if (isset($params['project'])) {
+            $slug = ltrim($params['project']->slug, '/');
+            foreach ($this->rules as $rule) {
+                if ($route == $rule['route']) {
+                    return $slug . '/' . $rule['pattern'];
+                }
             }
 
-            if (isset($params['group'])) {
-                return $params['group'] . '/' . $params['project'];
-            }
+            return $slug;
         }
 
         return false;
